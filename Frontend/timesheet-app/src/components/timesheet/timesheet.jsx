@@ -69,11 +69,9 @@ const columns = [
     },
 ];
 
-function onChange() {
-    console.log("date change");
-}
-function getEndDate() {
-    var today = new Date()
+
+function getEndDate(_today = new Date()) {
+    var today = _today
     var days = Math.abs(today.getDay() - 6)
     today.setDate(today.getDate() + days)
     console.log(moment(today).format(dateFormat))
@@ -82,20 +80,29 @@ function getEndDate() {
 
 
 export default class Timesheet extends Component {
-   
-    updateEndDate() {
-        this.setState({endDate: getEndDate()})
-        this.updateDateArray()
+
+    dataPickerChange(value) {
+        if (value != null) {
+            console.log(value.toDate())
+            this.setState({endDate: value.toDate()})
+        }
     }
+
     updateDateArray() {
         var today = new Date()
         var arr = []
         var i = 1
-        console.log("today is: ",today)
-        console.log("end date is: ", this.state.endDate)
-        console.log(today < this.state.endDate)
-        while (today <= this.state.endDate) { 
-           
+        var monToday = moment(today).format('MM/DD/YYYY');
+        
+        var momentEndDate = moment(this.state.endDate).format('MM/DD/YYYY');
+        if (moment(momentEndDate).diff(moment(monToday), 'days') > 7) {
+            console.log("more than!!!")
+            today.setDate(this.state.endDate.getDate() - 6)
+            monToday = moment(today).format('MM/DD/YYYY');
+        } 
+        console.log(monToday)
+        while (monToday <= momentEndDate) { 
+            console.log("i is: ", i)
             arr.push({
                 key: i,
                 day: moment(today).format('dddd'),
@@ -109,17 +116,21 @@ export default class Timesheet extends Component {
             })
             i++;
             today.setDate(today.getDate() + 1); 
-            console.log("today is: ",today)
-            console.log("end date is: ", this.state.endDate) 
+            monToday = moment(today).format('MM/DD/YYYY')
         }
         this.setState({rows: arr})
-        console.log("initialting", this.state.rows)
+        
+        console.log("changing data", this.state.rows)
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (this.state.endDate != prevState.endDate) {
+            this.updateDateArray()
+        }
     }
 
     componentDidMount() {
-        this.updateEndDate();
-      //  this.initDateArray();
-       
+        
     }
     
     constructor(props) {
@@ -136,10 +147,7 @@ export default class Timesheet extends Component {
 
             <div>
                 <p>This is timesheet tab</p>
-                {/* <h4>Week Ending {this.state.endDate}</h4> */}
-            
-                <DatePicker defaultValue={moment(moment(this.state.endDate).format(dateFormat), dateFormat)} format={dateFormat} onChange={onChange} />
-                {/* <Table dataSource={dataSource} columns={columns} />; */}
+                <DatePicker defaultValue={moment(moment(this.state.endDate).format(dateFormat), dateFormat)} format={dateFormat} onChange={value => this.dataPickerChange(value)}/>
                 <Table dataSource={this.state.rows} columns={columns} />;
             </div>
         )
