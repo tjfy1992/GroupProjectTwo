@@ -50,8 +50,6 @@ function getEndDate(_today = new Date()) {
 }
 const NASelect = <Select style={{ width: 120 }} defaultValue='N/A' disabled></Select>
 const zeroHourSelect = <Select style={{ width: 120 }} defaultValue={0.00} disabled></Select>
-const TimeList = []
-const vacationOptions = []
 const approveOptionList = ['Approved timesheet', 'unapproved timesheet'];
 const holidayOption = [
   //  Floating Day/Holiday/Vacation/default
@@ -60,6 +58,13 @@ const holidayOption = [
     { label: 'Holiday', value: 2},
     { label: 'Vacation', value: 3},
   ];
+const holidayOptionDis = [
+    //  Floating Day/Holiday/Vacation/default
+      { label: 'Default', value: 0, disabled: true},
+      { label: 'Floating Day', value: 1, disabled: true},
+      { label: 'Holiday', value: 2},
+      { label: 'Vacation', value: 3, disabled: true},
+    ];
 const workHourData = [0.00, 1.00, 2.00, 3.00, 4.00, 5.00, 6.00, 7.00, 8.00, 9.00, 10.00, 11.00, 12.00, 13.00, 14.00, 15.00, 16.00, 17.00, 18.00, 19.00, 20.00, 21.00, 22.00, 23.00, 24.00]
 
 
@@ -200,10 +205,14 @@ export default class Timesheet extends Component {
         } 
         this.setState({ rows: arr }, () => {
             for (let i = 0; i < this.state.rows.length; i++) {
+                let isHoliday = false
+                if (this.state.rows[i].day == 0 || this.state.rows[i].day == 6) {
+                    isHoliday = true
+                }
                 this.state.rows[i].holidayGroup = <Radio.Group
-                options={holidayOption}
+                options={isHoliday ? holidayOptionDis : holidayOption}
                 onChange={(value)=>{this.holidayValueChange(i, value)}}
-                value={this.state.rows[i].holidayMeta}
+                value={isHoliday? 2 : this.state.rows[i].holidayMeta}
                 optionType="button"
                 buttonStyle="solid"
                 />
