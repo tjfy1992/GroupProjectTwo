@@ -118,7 +118,9 @@ export default class Timesheet extends Component {
         let preRow = { ...this.state.rows }
         if (preRow[rowId] == undefined) { console.log("undefined row"); return }
         preRow[rowId].startMeta = value
-        preRow[rowId].workHourMeta = preRow[rowId].endTimeMeta - value < 0 ? 0 : preRow[rowId].endTimeMeta - value
+        let newWorkHour = preRow[rowId].endTimeMeta - value < 0 ? 0 : preRow[rowId].endTimeMeta - value
+        preRow[rowId].workHourMeta = newWorkHour
+        preRow[rowId].totalHours = <InputNumber min={0} max={40} disabled={true} value={newWorkHour} />
         this.setState({ preRow }, () => {
             this.calTotalBillCopo()
         });
@@ -139,7 +141,9 @@ export default class Timesheet extends Component {
         let preRow = { ...this.state.rows }
         if (preRow[rowId] == undefined) { console.log("undefined row"); return }
         preRow[rowId].endTimeMeta = value
-        preRow[rowId].workHourMeta = value - preRow[rowId].startTimeMeta < 0 ? 0 : value - preRow[rowId].startTimeMeta
+        let newWorkHour = value - preRow[rowId].startTimeMeta < 0 ? 0 : value - preRow[rowId].startTimeMeta
+        preRow[rowId].workHourMeta = newWorkHour
+        preRow[rowId].totalHours = <InputNumber min={0} max={40} disabled={true} value={newWorkHour} />
         this.setState({ preRow }, () => {
             this.calTotalBillCopo()
         });
