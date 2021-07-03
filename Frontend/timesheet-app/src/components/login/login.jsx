@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import './login.css';
 import axios from 'axios'
 import PropTypes from 'prop-types';
-import {withRouter } from 'react-router';
 
 export default class Login extends Component {
 
