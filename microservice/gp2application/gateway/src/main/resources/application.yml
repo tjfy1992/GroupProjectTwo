@@ -1,0 +1,33 @@
+server:
+  port: 9000
+
+spring:
+  application:
+    name: gateway
+
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedHeaders: "*"
+            allowedMethods:
+              - GET
+              - POST
+
+      routes:
+        - id: core-service
+          uri:  lb://core-service
+          predicates:
+            - Path=/core/**
+
+        - id: compositive-service
+          uri:  lb://compositive-service
+          predicates:
+            - Path=/composite/**
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone:  ${EUREKA_URI:http://localhost:8761/eureka}
