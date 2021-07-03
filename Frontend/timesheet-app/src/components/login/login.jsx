@@ -6,8 +6,8 @@ export default class Login extends Component {
 
     submitLogin = (e) => {
         e.preventDefault();
-         //this.testGet();
-         //this.testPost();
+         this.testGet();
+         this.testPost();
         console.log('The link was clicked.');
     };
 
