@@ -4,6 +4,10 @@ server:
 spring:
   application:
     name: core-service
+  data:
+    mongodb:
+      uri: mongodb+srv://admin:iYAuBD5DrNE8p_L@cluster0.s2s9x.mongodb.net/project2_db?retryWrites=true&w=majority
+      database: project2_db
 
 eureka:
   client:
