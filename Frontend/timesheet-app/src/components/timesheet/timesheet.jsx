@@ -60,18 +60,31 @@ const zeroHourSelect = <Select style={{ width: 120 }} defaultValue={0.00} disabl
 const TimeList = []
 const vacationOptions = []
 const approveOptionList = ['Approved timesheet', 'unapproved timesheet'];
+//const approveOptionList = ['Approved timesheet', 'unapproved timesheet'];
 const workHourData = [0.00, 1.00, 2.00, 3.00, 4.00, 5.00, 6.00, 7.00, 8.00, 9.00, 10.00, 11.00, 12.00, 13.00, 14.00, 15.00, 16.00, 17.00, 18.00, 19.00, 20.00, 21.00, 22.00, 23.00, 24.00]
 
 
 export default class Timesheet extends Component {
 
+    floatCheckBox = (rowId) => {return <Checkbox id={rowId} checked={this.state.rows[0] === undefined ? true : false} onChange={(e)=>this.checkBoxChanged(e, rowId, 1)}></Checkbox>}
+    // floatCheckBox = (rowId) => {return <Checkbox id={rowId} checked={this.state.rows[rowId] === undefined ? true : this.state.rows[rowId].holidayMeta == 1 ? false : false} onChange={(e)=>this.checkBoxChanged(e, rowId, 1)}></Checkbox>}
+  
+    // floatCheckBox = (rowId) => {return <Checkbox ></Checkbox>}
+    holidayCheckBox = (rowId) => {return <Checkbox onChange={this.checkBoxChanged(rowId, 2)}></Checkbox>}
 
-    checkBox = (rowId) => {return <Checkbox onChange={(e) => this.checkBoxChanged(rowId)}></Checkbox>}
+    vacationcheckBox = (rowId) => {return <Checkbox checked={this.state.rows[rowId] != undefined && this.state.rows[rowId].holidayMeta == 1} onChange={(e) => this.checkBoxChanged(rowId, 3)}></Checkbox>}
 
-    checkBoxChanged(rowId) {
-        console.log(rowId)
+    //checkBoxChanged(e, rowId, holidayMeta) {
+    checkBoxChanged = (e, rowId, holidayMeta) => {
+        console.log("row is", rowId)
+        console.log("row is", this.state.rows[rowId])
+        let preRow = {...this.state.rows}
+        if (preRow[rowId] == undefined) {console.log("undefined row"); return}
+        preRow[rowId].holidayMeta = holidayMeta
+        this.setState({preRow})
+        console.log("changed", this.state.rows[rowId].holidayMeta)
     }
-    
+
     approveSelect = <Select style={{ width: 200 }} defaultValue='Approved timesheet' onChange={(e) => this.approveSelectChange('1111',e)}>{approveOptionList.map((item, index) => <Option value={item} >{item}</Option>)}</Select>
     
     approveSelectChange(id, e) {
@@ -101,12 +114,12 @@ export default class Timesheet extends Component {
     }
 
     updateDateArray() {
-        var today = new Date()
-        var arr = []
-        var i = 1
-        var monToday = moment(today).format('MM/DD/YYYY');
+        let today = new Date()
+        let arr = []
+        let i = 1
+        let monToday = moment(today).format('MM/DD/YYYY');
 
-        var momentEndDate = moment(this.state.endDate).format('MM/DD/YYYY');
+        let momentEndDate = moment(this.state.endDate).format('MM/DD/YYYY');
         if (moment(momentEndDate).diff(moment(monToday), 'days') > 7) {
             console.log("more than!!!")
             today.setDate(this.state.endDate.getDate() - 6)
@@ -126,9 +139,11 @@ export default class Timesheet extends Component {
                 startTime: startSelector,
                 endingTime: endSelector,
                 totalHours: workHourSelect,
-                floatingDay: this.checkBox(i - 1),
-                holiday: this.checkBox(i - 1),
-                vacation: this.checkBox(i - 1),
+                floatingDay: ((i) => {return this.floatCheckBox(i - 1)})(i),
+                //floatingDay: ((i) => {return <Checkbox checked={this.state.rows[i] == undefined ? true : false} onChange={(e) => this.checkBoxChanged(e, i , 1)}></Checkbox>})(i), 
+                holiday: this.holidayCheckBox(i - 1),
+                vacation: this.vacationcheckBox(i - 1),
+              //  holidayMeta: 0
             })
             i++;
             today.setDate(today.getDate() + 1);
@@ -146,7 +161,9 @@ export default class Timesheet extends Component {
             this.updateDateArray()
         }
         if (this.state.rows != prevState.rows) {
-            // this.updateDateArray()
+            // this.state.rows.forEach( (value, index) => {
+
+            // }
         }
     }
 
