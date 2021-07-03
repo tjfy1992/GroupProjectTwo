@@ -5,6 +5,7 @@ import Profile from '../profile/profile';
 import Summary from '../summary/summary';
 import Timesheet from '../timesheet/timesheet';
 import { Layout, Menu } from 'antd';
+import PropTypes from 'prop-types';
 
 const { Header, Content, Footer } = Layout;
 
@@ -12,6 +13,22 @@ const { TabPane } = Tabs;
 const { SubMenu } = Menu;
 
 export default class Homepage extends Component {
+
+    static contextTypes = {
+        router: PropTypes.object.isRequired,
+    }
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            username: ''
+        };
+    }
+
+    componentDidMount(){
+        this.setState({username: localStorage.getItem('username')});
+    }
+
     render() {
         return (
 
@@ -22,8 +39,8 @@ export default class Homepage extends Component {
                         <span>Welcome to Smart Time sheet</span>
                     </Menu>
                     <Menu theme="dark" mode="horizontal" style={{float: 'right'}} >
-                        <SubMenu key="SubMenu" title="User">
-                            <Menu.Item key="setting:1">Log out</Menu.Item>
+                        <SubMenu key="SubMenu" title={this.state.username}>
+                            <Menu.Item key="setting:1" onClick={this.logout}>Log out</Menu.Item>
                         </SubMenu>
                     </Menu>
                 </Header>
@@ -57,5 +74,10 @@ export default class Homepage extends Component {
 
     callback = (key) => {
         console.log(key);
+    }
+
+    logout = (item, key, keyPath, domEvent) => {
+        localStorage.clear();
+        this.props.history.push('/');
     }
 }

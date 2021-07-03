@@ -22,37 +22,22 @@ public class UserController {
 
     @PostMapping(value="/login")
     public Map<String, Object> login(@RequestParam Map<String, Object> params){
-        System.out.println(params);
-        System.out.println("test");
-        if(params.get("username") == null && params.get("email") == null){
+        if(params.get("username") == null){
             Map<String, Object> resultMap = new HashMap<>();
-            resultMap.put("success", false);
-            resultMap.put("reason", "Invalid username or email for login");
+            resultMap.put("result", "failed");
             return resultMap;
         }
         Map<String, Object> map =  iUserService.userLogin(params);
         User user = (User) map.get("user");
+        System.out.println(user);
         if(user != null){
-            String token = JwtUtil.generateToken(signingKey, user.getUsername());
+            Map<String, Object> tokenObj = new HashMap<>();
+            tokenObj.put("username", user.getUsername());
+            tokenObj.put("id", user.getId());
+            String token = JwtUtil.generateToken(signingKey, tokenObj.toString());
             map.put(jwtTokenCookieName, token);
         }
         return map;
     }
-
-    @PostMapping("/register")
-    public Map<String, Object> register(@RequestParam Map<String, Object> params){
-        if(params.get("username") == null || params.get("email") == null){
-            Map<String, Object> resultMap = new HashMap<>();
-            resultMap.put("success", false);
-            resultMap.put("reason", "Invalid username or email for register");
-            return resultMap;
-        }
-        Map<String, Object> result = iUserService.userRegister(params);
-        result.put("email", params.get("email"));
-        String token = JwtUtil.generateToken(signingKey, params.get("username").toString());
-        result.put(jwtTokenCookieName, token);
-        return result;
-    }
-
 
 }
