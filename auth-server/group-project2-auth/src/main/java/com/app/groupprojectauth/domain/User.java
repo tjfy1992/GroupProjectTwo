@@ -1,22 +1,19 @@
 package com.app.groupprojectauth.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.sql.Date;
+import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@ToString
+@Document("user")
 public class User {
-    private Integer id;
+    @Id
+    private String id;
     private String username;
-    private String email;
-    private Integer personId;
-    private Date creationDate;
-    private String roleName;
-    private Boolean activated;
+    private String password;
 }

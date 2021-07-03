@@ -6,13 +6,19 @@ import reportWebVitals from './reportWebVitals';
 import axios from 'axios';
 import qs from 'qs';
 
-//axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 
 //axios interceptor for request
 axios.interceptors.request.use(
 
   (config) => {
-    console.log(config.method)
+    let token = localStorage.getItem('token')
+    if(token){
+      config.headers['token'] = token;
+    }
+    else{
+      config.headers['token'] = '';
+    }
+
     if (config.method === "post"){
         config.data = qs.stringify(config.data);
         config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
@@ -21,9 +27,6 @@ axios.interceptors.request.use(
   },
 
   (req) => {
-    console.log(123)
-     //req.headers['Access-Control-Allow-Origin'] = '*';
-     //todo: add token here
      return req;
   },
 
@@ -38,6 +41,10 @@ axios.interceptors.response.use(
     return successRes;
   }, 
   (error) => {
+    if(error.response.status === 403){
+      localStorage.clear()
+      window.location.href = 'http://localhost:3000'
+    }
     return Promise.reject(error);
   }
 );
