@@ -30,19 +30,9 @@ const columns = [
         key: 'totalHours',
     },
     {
-        title: 'Floating Day',
-        dataIndex: 'floatingDay',
-        key: 'floatingDay',
-    },
-    {
-        title: 'Holiday',
-        dataIndex: 'holiday',
-        key: 'holiday',
-    },
-    {
-        title: 'Vacation',
-        dataIndex: 'vacation',
-        key: 'vacation',
+        title: 'Floating Day/Holiday/Vacation',
+        dataIndex: 'holidayGroup',
+        key: 'holidayGroup',
     },
 ];
 
@@ -63,31 +53,17 @@ const zeroHourSelect = <Select style={{ width: 120 }} defaultValue={0.00} disabl
 const TimeList = []
 const vacationOptions = []
 const approveOptionList = ['Approved timesheet', 'unapproved timesheet'];
-
-//const approveOptionList = ['Approved timesheet', 'unapproved timesheet'];
+const holidayOption = [
+  //  Floating Day/Holiday/Vacation/default
+    { label: 'Default', value: 0},
+    { label: 'Floating Day', value: 1},
+    { label: 'Holiday', value: 2},
+    { label: 'Vacation', value: 3},
+  ];
 const workHourData = [0.00, 1.00, 2.00, 3.00, 4.00, 5.00, 6.00, 7.00, 8.00, 9.00, 10.00, 11.00, 12.00, 13.00, 14.00, 15.00, 16.00, 17.00, 18.00, 19.00, 20.00, 21.00, 22.00, 23.00, 24.00]
 
 
 export default class Timesheet extends Component {
-
-    floatCheckBox = (rowId) => { return <Checkbox id={rowId} checked={this.state.rows[0] === undefined ? true : false} onChange={(e) => this.checkBoxChanged(e, rowId, 1)}></Checkbox> }
-    // floatCheckBox = (rowId) => {return <Checkbox id={rowId} checked={this.state.rows[rowId] === undefined ? true : this.state.rows[rowId].holidayMeta == 1 ? false : false} onChange={(e)=>this.checkBoxChanged(e, rowId, 1)}></Checkbox>}
-
-    // floatCheckBox = (rowId) => {return <Checkbox ></Checkbox>}
-    holidayCheckBox = (rowId) => { return <Checkbox onChange={this.checkBoxChanged(rowId, 2)}></Checkbox> }
-
-    vacationcheckBox = (rowId) => { return <Checkbox checked={this.state.rows[rowId] != undefined && this.state.rows[rowId].holidayMeta == 1} onChange={(e) => this.checkBoxChanged(rowId, 3)}></Checkbox> }
-
-    //checkBoxChanged(e, rowId, holidayMeta) {
-    checkBoxChanged = (e, rowId, holidayMeta) => {
-        console.log("row is", rowId)
-        console.log("row is", this.state.rows[rowId])
-        let preRow = { ...this.state.rows }
-        if (preRow[rowId] == undefined) { console.log("undefined row"); return }
-        preRow[rowId].holidayMeta = holidayMeta
-        this.setState({ preRow })
-        console.log("changed", this.state.rows[rowId].holidayMeta)
-    }
 
     approveSelect = <Select style={{ width: 200 }} defaultValue='Approved timesheet' onChange={(e) => this.approveSelectChange('1111', e)}>{approveOptionList.map((item, index) => <Option value={item} >{item}</Option>)}</Select>
 
@@ -156,6 +132,20 @@ export default class Timesheet extends Component {
         }
     }
 
+    holidayValueChange(rowId, e) {
+        console.log("holiday meta change: ", e.target.value)
+        let preRow = { ...this.state.rows }
+        if (preRow[rowId] == undefined) { console.log("undefined row"); return }
+        preRow[rowId].holidayMeta = e.target.value
+        preRow[rowId].holidayGroup = <Radio.Group
+                options={holidayOption}
+                onChange={(value)=>{this.holidayValueChange(rowId, value)}}
+                value={e.target.value}
+                optionType="button"
+                buttonStyle="solid"/>
+        this.setState(preRow)
+    }
+
     updateDateArray() {
         console.log("updating arr ", this.state.endDate)
         let today = new Date()
@@ -197,13 +187,11 @@ export default class Timesheet extends Component {
                 startTime: startSelector,
                 endingTime: endSelector,
                 totalHours: null,
-                floatingDay: ((i) => { return this.floatCheckBox(i - 1) })(i),
-                holiday: this.holidayCheckBox(i - 1),
-                vacation: this.vacationcheckBox(i - 1),
                 holidayMeta: 0,
                 startTimeMeta: startMeta,
                 endTimeMeta: endMeta,
-                workHourMeta: workHourMeta
+                workHourMeta: workHourMeta,
+                holidayGroup: null
             })
 
             i++;
@@ -212,6 +200,13 @@ export default class Timesheet extends Component {
         } 
         this.setState({ rows: arr }, () => {
             for (let i = 0; i < this.state.rows.length; i++) {
+                this.state.rows[i].holidayGroup = <Radio.Group
+                options={holidayOption}
+                onChange={(value)=>{this.holidayValueChange(i, value)}}
+                value={this.state.rows[i].holidayMeta}
+                optionType="button"
+                buttonStyle="solid"
+                />
                 this.state.rows[i].totalHours = <InputNumber min={0} max={40} disabled={true} value={this.state.rows[i].workHourMeta} />
             }
         });
@@ -225,16 +220,12 @@ export default class Timesheet extends Component {
         if (this.state.endDate != prevState.endDate) {
             this.updateDateArray()
         }
-        // for (let i = 0; i < prevState.length; i++) {
-        //     if (i >)
-        // }
+    
         if (this.state.rows != prevState.rows) {
             //alert(this.state.rows.length)
             console.log("rows change", this.state.rows)
             this.calTotalBillCopo()
-            // this.state.rows.forEach( (value, index) => {
-
-            // }
+        
         }
 
 
