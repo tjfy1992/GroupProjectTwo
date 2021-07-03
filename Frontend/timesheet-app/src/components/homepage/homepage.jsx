@@ -6,6 +6,7 @@ import Summary from '../summary/summary';
 import Timesheet from '../timesheet/timesheet';
 import { Layout, Menu } from 'antd';
 import PropTypes from 'prop-types';
+import axios from 'axios'
 
 const { Header, Content, Footer } = Layout;
 
@@ -26,7 +27,21 @@ export default class Homepage extends Component {
     }
 
     componentDidMount(){
+        this.testGet();
         this.setState({username: localStorage.getItem('username')});
+    }
+
+    testGet = () => {
+        axios({
+            method: 'get',
+            url: 'http://localhost:9000/composite/testClientGet',
+          })
+            .then((response) => {
+                console.log(response)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
     }
 
     render() {
