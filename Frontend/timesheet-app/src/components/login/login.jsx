@@ -1,12 +1,45 @@
 import React, { Component } from 'react'
 import './login.css';
+import axios from 'axios'
 
 export default class Login extends Component {
 
     submitLogin = (e) => {
         e.preventDefault();
+         //this.testGet();
+         //this.testPost();
         console.log('The link was clicked.');
-      };
+    };
+
+    testGet = () => {
+        axios({
+            method: 'get',
+            url: 'http://localhost:9000/composite/testClientGet',
+          })
+            .then((response) => {
+                console.log(response)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
+    testPost = () => {
+        axios({
+            method: 'post',
+            url: 'http://localhost:9000/composite/testClientPost',
+            data: {
+              firstName: 'Fred',
+              lastName: 'Flintstone'
+            }
+          })
+            .then((response) => {
+                console.log(response)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
 
     render() {
         return (
