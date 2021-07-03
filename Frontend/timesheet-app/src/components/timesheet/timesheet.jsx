@@ -66,7 +66,12 @@ const workHourData = [0.00, 1.00, 2.00, 3.00, 4.00, 5.00, 6.00, 7.00, 8.00, 9.00
 export default class Timesheet extends Component {
 
 
-    checkBox = <Checkbox ></Checkbox>
+    checkBox = (rowId) => {return <Checkbox onChange={(e) => this.checkBoxChanged(rowId)}></Checkbox>}
+
+    checkBoxChanged(rowId) {
+        console.log(rowId)
+    }
+    
     approveSelect = <Select style={{ width: 200 }} defaultValue='Approved timesheet' onChange={(e) => this.approveSelectChange('1111',e)}>{approveOptionList.map((item, index) => <Option value={item} >{item}</Option>)}</Select>
     
     approveSelectChange(id, e) {
@@ -77,14 +82,14 @@ export default class Timesheet extends Component {
         console.log(rowId)
     }
 
-   
+
     weekDayworkHourSelect = (rowId) => {return <Select style={{ width: 120 }} defaultValue={0.00} onChange={() => this.weekDayworkHourChange(rowId)}>{workHourData.map(item =>
         <Option value={item}>{item}</Option>)}
         </Select>
     }
 
-    weekDayStartSelect = <Select style={{ width: 120 }} defaultValue={'N/A'}>{TimeList}</Select>
-    weekDayEndSelect = <Select style={{ width: 120 }} defaultValue={'N/A'}>{TimeList}</Select>
+    weekDayStartSelect = (rowId) => {return <Select style={{ width: 120 }} defaultValue={'N/A'}>{TimeList}</Select>}
+    weekDayEndSelect = (rowId) => {return <Select style={{ width: 120 }} defaultValue={'N/A'}>{TimeList}</Select>}
     
     
 
@@ -111,8 +116,8 @@ export default class Timesheet extends Component {
         while (monToday <= momentEndDate) {
             console.log("i is: ", i)
             console.log(today.getDay())
-            var startSelector = (today.getDay() == 6 || today.getDay() == 0) ? NASelect : this.weekDayStartSelect
-            var endSelector = (today.getDay() == 6 || today.getDay() == 0) ? NASelect : this.weekDayEndSelect
+            var startSelector = (today.getDay() == 6 || today.getDay() == 0) ? NASelect : this.weekDayStartSelect(i - 1)
+            var endSelector = (today.getDay() == 6 || today.getDay() == 0) ? NASelect : this.weekDayEndSelect(i - 1)
             var workHourSelect = (today.getDay() == 6 || today.getDay() == 0) ? zeroHourSelect : this.weekDayworkHourSelect(i - 1)
             arr.push({
                 key: i,
@@ -121,9 +126,9 @@ export default class Timesheet extends Component {
                 startTime: startSelector,
                 endingTime: endSelector,
                 totalHours: workHourSelect,
-                floatingDay: this.checkBox,
-                holiday: this.checkBox,
-                vacation: this.checkBox,
+                floatingDay: this.checkBox(i - 1),
+                holiday: this.checkBox(i - 1),
+                vacation: this.checkBox(i - 1),
             })
             i++;
             today.setDate(today.getDate() + 1);
