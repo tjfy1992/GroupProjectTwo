@@ -11,15 +11,19 @@ import io.jsonwebtoken.Jwts;
 public class AuthController {
 
     @PostMapping("/checkToken")
-    public Map<String, Object> checkToken(@RequestBody Map<String, Object> params){
+    public Map<String, Object> checkToken(@RequestParam Map<String, Object> params){
         Map<String, Object> resultMap = new HashMap<>();
         String token = params.get("token").toString();
-        String str = Jwts.parser().setSigningKey("signingKey").parseClaimsJws(token).getBody().getSubject();
-        System.out.println(str);
-        if(str != null)
-            resultMap.put("authenticated", "yes");
-        else
+        try {
+            String str = Jwts.parser().setSigningKey("signingKey").parseClaimsJws(token).getBody().getSubject();
+            if(str != null)
+                resultMap.put("authenticated", "yes");
+            else
+                resultMap.put("authenticated", "no");
+        }
+        catch (Exception e){
             resultMap.put("authenticated", "no");
+        }
         return resultMap;
     }
 }
