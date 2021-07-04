@@ -3,6 +3,7 @@ import {Button, Table, Tag, Space, Badge,Tooltip} from 'antd';
 import {InfoCircleTwoTone} from '@ant-design/icons';
 import axios from 'axios';
 
+
 const data = [{
 
   weekEnding: '3/24/2018', 
@@ -220,20 +221,10 @@ export default class Summary extends Component {
     };
   }
 
-  renderTableData() {
-    return this.state.summarys
-      .slice(0, this.state.count)
-      .map((summary, index) => {
-      
-        return (
-          summary
-        );
-      });
-  }
-    // username: Cookies.get('Username')
+
   
     handleShowMore = () => {
-      if (this.state.summarys.length - this.state.count < 2 && this.state.count != this.state.summarys.length ) {
+      if (this.state.summarys.length - this.state.count < 2 && this.state.count !== this.state.summarys.length ) {
         this.setState({
           count: this.state.summarys.length,
           show: "Hide All",
@@ -253,16 +244,41 @@ export default class Summary extends Component {
 
   componentDidMount() {
     this.setState({summarycolumns: columns});
-    this.setState({summarys: data});
-    let userId = localStorage.getItem("userID");
-        this.userId = 1;
+    // this.setState({summarys: data});
+    // localStorage.setItem('username', 'zack');
+    // let userName = localStorage.getItem("username");
       axios
-        .get(`http://localhost:3000/summary?userId=` + this.userId)
-        .then((res) => {
-          this.setState({ summarys: this.data} );
-        });
+      .get('http://localhost:9000/core/test/summary?unsername=zack')
+      .then(e => this.setState({summarys: e.data}))
+      
+      // ({
+      //       method: 'get',
+      //       url: 'https://localhost:9000/core/test/summary',
+      //       params:{
+      //         username  : 'zack'
+      //       }
+      //     })
+      //       .then((response) => {
+      //         const summaryss = response.data;
+      //         this.setState({summarys:summaryss});
+      //           console.log(response)
+      //       })
+      //       .catch((error) => {
+      //           console.log(error)
+      //   })
   }
   
+  renderTableData() {
+    return this.state.summarys
+      .slice(0, this.state.count)
+      .map((summary, index) => {
+      
+        return (
+          summary
+        );
+      });
+  }
+
     render() {
         return (
 
@@ -274,5 +290,6 @@ export default class Summary extends Component {
                 </Button>
             </div>
         )
+        
     }
 }
