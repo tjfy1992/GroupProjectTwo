@@ -45,23 +45,23 @@ public class TestController {
         return ResponseEntity.ok(list);
     }
 
-    @GetMapping("/gettimesheet")
-    public ResponseEntity<Week> getWeek(@RequestParam Map<String, String> weekending) {
-        String weekendat = weekending.get("weekEnding");
-        Day sun = new Day();
-        Day mon = new Day();
-        Day tue = new Day();
-        Day wed = new Day();
-        Day thu = new Day();
-        Day fri = new Day();
-        Day sat = new Day();
-        BsonTimestamp bt = BsonTimestamp(1617163200000);
-
-        Week result = new Week(1617163200000,sun,mon,tue,wed,thu,fri,sat);
-
-        System.out.println(result.toString());
-        return ResponseEntity.ok(result);
-    }
+//    @GetMapping("/gettimesheet")
+//    public ResponseEntity<Week> getWeek(@RequestParam Map<String, String> weekending) {
+//        String weekendat = weekending.get("weekEnding");
+//        Day sun = new Day();
+//        Day mon = new Day();
+//        Day tue = new Day();
+//        Day wed = new Day();
+//        Day thu = new Day();
+//        Day fri = new Day();
+//        Day sat = new Day();
+//        BsonTimestamp bt = BsonTimestamp(1617163200000);
+//
+//        Week result = new Week(1617163200000,sun,mon,tue,wed,thu,fri,sat);
+//
+//        System.out.println(result.toString());
+//        return ResponseEntity.ok(result);
+//    }
 
     @GetMapping("/profile")
     public ResponseEntity<User> getUserProfile(@RequestParam Map<String, String> username) {
