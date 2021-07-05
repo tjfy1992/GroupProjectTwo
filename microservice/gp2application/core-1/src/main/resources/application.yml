@@ -8,8 +8,20 @@ spring:
     mongodb:
       uri: mongodb+srv://admin:iYAuBD5DrNE8p_L@cluster0.s2s9x.mongodb.net/project2_db?retryWrites=true&w=majority
       database: project2_db
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 20MB
+      max-request-size: 20MB
 
 eureka:
   client:
     serviceUrl:
       defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+
+custom:
+  aws:
+    access-key: AKIARYEPTS6KTA72GBRF
+    secret-key: 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
+    bucket: gp2storage
+    endpoint: http://gp2storage.s3-website.us-east-2.amazonaws.com

@@ -1,13 +1,20 @@
 import React, { Component } from 'react'
-import { Table, DatePicker, Select, Checkbox, Radio, Button, InputNumber } from "antd";
+import { Table, DatePicker, Select, Checkbox, Radio, Button, InputNumber, Upload, message } from "antd";
+import { UploadOutlined } from '@ant-design/icons';
+import axios from 'axios'
 import moment from 'moment';
 const dateFormat = 'DD MMMM YYYY';
+
 const { Option } = Select;
+const ALLOW_FILES = new Set(['image/JPEG', 'application/pdf',
+'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+'application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword'
+])
 const columns = [
     {
         title: 'Day',
-        dataIndex: 'day',
-        key: 'day',
+        dataIndex: 'dayStr',
+        key: 'dayStr',
     },
     {
         title: 'Date',
@@ -50,18 +57,22 @@ function getEndDate(_today = new Date()) {
 }
 const NASelect = <Select style={{ width: 120 }} defaultValue='N/A' disabled></Select>
 const zeroHourSelect = <Select style={{ width: 120 }} defaultValue={0.00} disabled></Select>
-const TimeList = []
-const vacationOptions = []
 const approveOptionList = ['Approved timesheet', 'unapproved timesheet'];
 const holidayOption = [
-  //  Floating Day/Holiday/Vacation/default
-    { label: 'Default', value: 0},
-    { label: 'Floating Day', value: 1},
-    { label: 'Holiday', value: 2},
-    { label: 'Vacation', value: 3},
-  ];
-const workHourData = [0.00, 1.00, 2.00, 3.00, 4.00, 5.00, 6.00, 7.00, 8.00, 9.00, 10.00, 11.00, 12.00, 13.00, 14.00, 15.00, 16.00, 17.00, 18.00, 19.00, 20.00, 21.00, 22.00, 23.00, 24.00]
-
+    //  Floating Day/Holiday/Vacation/default
+    { label: 'Default', value: 0 },
+    { label: 'Floating Day', value: 1 },
+    { label: 'Holiday', value: 2 },
+    { label: 'Vacation', value: 3 },
+];
+const holidayOptionDis = [
+    //  Floating Day/Holiday/Vacation/default
+    { label: 'Default', value: 0, disabled: true },
+    { label: 'Floating Day', value: 1, disabled: true },
+    { label: 'Holiday', value: 2 },
+    { label: 'Vacation', value: 3, disabled: true },
+];
+const workHourData = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
 
 export default class Timesheet extends Component {
 
@@ -85,7 +96,7 @@ export default class Timesheet extends Component {
     weekDayStartSelect = (rowId) => {
         return <Select style={{ width: 120 }} defaultValue={9} onChange={(value) => this.startChange(rowId, value)}>{
             workHourData.map(item =>
-                <Option value={item}>{item}</Option>)}
+                <Option value={item}>{item + ':00'}</Option>)}
         </Select>
     }
 
@@ -108,7 +119,7 @@ export default class Timesheet extends Component {
         return <Select style={{ width: 120 }} defaultValue={17}
             onChange={(value) => this.endChange(rowId, value)}>{
                 workHourData.map(item =>
-                    <Option value={item}>{item}</Option>)}
+                    <Option value={item}>{item + ':00'}</Option>)}
         </Select>
     }
 
@@ -138,11 +149,11 @@ export default class Timesheet extends Component {
         if (preRow[rowId] == undefined) { console.log("undefined row"); return }
         preRow[rowId].holidayMeta = e.target.value
         preRow[rowId].holidayGroup = <Radio.Group
-                options={holidayOption}
-                onChange={(value)=>{this.holidayValueChange(rowId, value)}}
-                value={e.target.value}
-                optionType="button"
-                buttonStyle="solid"/>
+            options={holidayOption}
+            onChange={(value) => { this.holidayValueChange(rowId, value) }}
+            value={e.target.value}
+            optionType="button"
+            buttonStyle="solid" />
         this.setState(preRow)
     }
 
@@ -183,6 +194,7 @@ export default class Timesheet extends Component {
             arr.push({
                 key: i,
                 day: day,
+                dayStr: moment(today).format('dddd'),
                 date: moment(today).format('MM/DD/YYYY'),
                 startTime: startSelector,
                 endingTime: endSelector,
@@ -197,15 +209,20 @@ export default class Timesheet extends Component {
             i++;
             today.setDate(today.getDate() + 1);
             monToday = moment(today).format('MM/DD/YYYY')
-        } 
+        }
+
         this.setState({ rows: arr }, () => {
             for (let i = 0; i < this.state.rows.length; i++) {
+                let isHoliday = false
+                if (this.state.rows[i].day == 0 || this.state.rows[i].day == 6) {
+                    isHoliday = true
+                }
                 this.state.rows[i].holidayGroup = <Radio.Group
-                options={holidayOption}
-                onChange={(value)=>{this.holidayValueChange(i, value)}}
-                value={this.state.rows[i].holidayMeta}
-                optionType="button"
-                buttonStyle="solid"
+                    options={isHoliday ? holidayOptionDis : holidayOption}
+                    onChange={(value) => { this.holidayValueChange(i, value) }}
+                    value={isHoliday ? 2 : this.state.rows[i].holidayMeta}
+                    optionType="button"
+                    buttonStyle="solid"
                 />
                 this.state.rows[i].totalHours = <InputNumber min={0} max={40} disabled={true} value={this.state.rows[i].workHourMeta} />
             }
@@ -217,15 +234,16 @@ export default class Timesheet extends Component {
 
     }
     componentDidUpdate(prevProps, prevState) {
+        //console.log(this.state.rows)
         if (this.state.endDate != prevState.endDate) {
             this.updateDateArray()
         }
-    
+
         if (this.state.rows != prevState.rows) {
             //alert(this.state.rows.length)
             console.log("rows change", this.state.rows)
             this.calTotalBillCopo()
-        
+
         }
 
 
@@ -254,10 +272,58 @@ export default class Timesheet extends Component {
         this.state = {
             endDate: getEndDate(),
             rows: [],
+            fileList: [],
             totalBill: 40,
             totalComposite: 40,
         };
     }
+
+    submitFile = () => {
+        console.log(this.state)
+        const formData = new FormData();
+        //for single file upload
+        formData.append('file', this.state.fileList[0]);
+        //add another parameter other than the file
+        formData.set("a", 1);
+        axios({
+            method: 'post',
+            url: 'http://localhost:9000/core/test/fileUploadWithForm',
+            data: formData,
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            },
+          })
+            .then((response) => {
+                console.log(response)
+            })
+            .catch((error) => {
+                console.log(error)
+        })
+    }
+
+    beforeUpload = (file) => {
+        if (!ALLOW_FILES.has(file.type)) {
+            message.error(`${file.name} can not be uploaded, only allow PDF, JPEG, Word, Excel files`);
+            return false
+        }
+        
+        console.log(file)
+        let files = [file];
+        this.setState({
+            fileList: [...files]
+        })
+        return false;
+   };
+
+    handleChange = (info) => {
+        if (info.file.status === 'uploading') {
+
+          return;
+        }
+        if (info.file.status === 'done') {
+          
+        }
+    };
 
     render() {
         return (
@@ -270,7 +336,11 @@ export default class Timesheet extends Component {
                 <Button>Set Default</Button>
                 <Table dataSource={this.state.rows} columns={columns} />;
                 {this.approveSelect}
-                <Button>Choose File</Button>
+                <Upload 
+                    onChange={this.handleChange}
+                    beforeUpload={this.beforeUpload}>
+                    <Button icon={<UploadOutlined />}>Click to Upload</Button>
+                </Upload>
                 <Button>Save</Button>
             </div>
         )
