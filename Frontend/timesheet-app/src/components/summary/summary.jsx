@@ -4,114 +4,60 @@ import {InfoCircleTwoTone} from '@ant-design/icons';
 import axios from 'axios';
 import moment from 'moment';
 
-const weekdata = [
-      {
-          weekEnding:1617163200000
-      },
-      {
-          startingTime:1617163200000,
-          endingTime:1617163200000,
-          isFloatingDay:'false',
-          isHoliday:'false',
-          isVacation:'false'
-      },
-      {
-        startingTime:1617163200000,
-        endingTime:1617163200000,
-        isFloatingDay:'false',
-        isHoliday:'false',
-        isVacation:'false'
-      },
-      {
-        startingTime:1617163200000,
-        endingTime:1617163200000,
-        isFloatingDay:'false',
-        isHoliday:'false',
-        isVacation:'false'
-      },
-      {
 
-        startingTime:1617163200000,
-        endingTime:1617163200000,
-        isFloatingDay:'false',
-        isHoliday:'false',
-        isVacation:'false'
-      },
-      {
-        startingTime:1617163200000,
-        endingTime:1617163200000,
-        isFloatingDay:'false',
-        isHoliday:'false',
-        isVacation:'false'
-      },
-      {
-        startingTime:1617163200000,
-        endingTime:1617163200000,
-        isFloatingDay:'false',
-        isHoliday:'false',
-        isVacation:'false'
-      },
-      {
-        startingTime:1617163200000,
-        endingTime:1617163200000,
-        isFloatingDay:'false',
-        isHoliday:'false',
-        isVacation:'false'
-        }
-];
 
-const data = [{
+// const data = [{
 
-  weekEnding: '3/24/2018', 
-  totalHours: 40, 
-  submissionStatus: 'Not Started', 
-  approvalStatus: 'N/A', 
-  usedfloatingday: 2,
-  holiday: 2,
-  usedvacationday: 2,
+//   weekEnding: '3/24/2018', 
+//   totalHours: 40, 
+//   submissionStatus: 'Not Started', 
+//   approvalStatus: 'N/A', 
+//   usedfloatingday: 2,
+//   holiday: 2,
+//   usedvacationday: 2,
 
-},
-{
+// },
+// {
 
-  weekEnding: '3/29/2018', 
-  totalHours: 30, 
-  submissionStatus: 'Incomplete', 
-  approvalStatus: 'Not approved', 
-  usedfloatingday: 3,
-  holiday: 0,
-  usedvacationday: 1,
+//   weekEnding: '3/29/2018', 
+//   totalHours: 30, 
+//   submissionStatus: 'Incomplete', 
+//   approvalStatus: 'Not approved', 
+//   usedfloatingday: 3,
+//   holiday: 0,
+//   usedvacationday: 1,
 
-},
-{
+// },
+// {
 
-  weekEnding: '3/21/2018', 
-  totalHours: 40, 
-  submissionStatus: 'Completed', 
-  approvalStatus: 'Approved', 
-  usedfloatingday: 0,
-  holiday: 0,
-  usedvacationday: 0,
-},
-{ 
-  weekEnding: '2/24/2018', 
-  totalHours: 20, 
-  submissionStatus: 'Completed', 
-  approvalStatus: 'N/A', 
-  usedfloatingday: 0,
-  holiday: 1,
-  usedvacationday: 3,
-},
-{
+//   weekEnding: '3/21/2018', 
+//   totalHours: 40, 
+//   submissionStatus: 'Completed', 
+//   approvalStatus: 'Approved', 
+//   usedfloatingday: 0,
+//   holiday: 0,
+//   usedvacationday: 0,
+// },
+// { 
+//   weekEnding: '2/24/2018', 
+//   totalHours: 20, 
+//   submissionStatus: 'Completed', 
+//   approvalStatus: 'N/A', 
+//   usedfloatingday: 0,
+//   holiday: 1,
+//   usedvacationday: 3,
+// },
+// {
 
-  weekEnding: '1/29/2018', 
-  totalHours: 10, 
-  submissionStatus: 'Incomplete', 
-  approvalStatus: 'N/A', 
-  usedfloatingday: 2,
-  holiday: 0,
-  usedvacationday: 1,
-},
-];
+//   weekEnding: '1/29/2018', 
+//   totalHours: 10, 
+//   submissionStatus: 'Incomplete', 
+//   approvalStatus: 'N/A', 
+//   usedfloatingday: 2,
+//   holiday: 0,
+//   usedvacationday: 1,
+// },
+// ];
 
 const columns = [
   {
@@ -268,48 +214,7 @@ const columns = [
   },
 ];
   
-const weekcolumns = [
-  {
-    title: 'Day',
-    dataIndex: 'day',
-    key: 'day',
-},
-{
-    title: 'Date',
-    dataIndex: 'date',
-    key: 'date',
-},
-{
-    title: 'Starting Time',
-    dataIndex: 'startingTimes',
-    key: 'startingTimes',
-},
-{
-    title: 'Ending Time',
-    dataIndex: 'endingTimes',
-    key: 'endingTimes',
-},
-{
-    title: 'Total Hours',
-    dataIndex: 'totalHours',
-    key: 'totalHours',
-},
-{
-    title: 'Floating Day',
-    dataIndex: 'isFloatingDay',
-    key: 'isFloatingDay',
-}, 
-{
-  title: 'Holiday',
-  dataIndex: 'isHoliday',
-  key: 'isHoliday',
-}, 
-{
-  title: 'Vacation',
-  dataIndex: 'isVacation',
-  key: 'isVacation',
-}, 
-];
+
 
 export default class Summary extends Component {
   constructor(props) {
@@ -318,8 +223,6 @@ export default class Summary extends Component {
       summarys: [],
       fordisplay:[],
       summarycolumns:[],
-      weeks:[],
-      weekscolumns:[],
       count: 2,
       show: "Show More",
     };
@@ -347,7 +250,7 @@ export default class Summary extends Component {
     };
 
   componentDidMount() {
-    this.setState({weekscolumns: weekcolumns})
+
     this.setState({summarycolumns: columns});
     // this.setState({summarys: data});
     // localStorage.setItem('username', 'zack');
@@ -357,78 +260,69 @@ export default class Summary extends Component {
       .then(e => this.setState({summarys: e.data}))
   }
 
-  onClickView = () => {
-    this.setState({weeks: weekdata});
-    // axios
-    //   .get('http://localhost:9000/core/test/gettimesheet?weekending=03/21/2018')
-    //   .then(r => this.setState({weeks: r.data}))
-  }
 
-  renderWeekData() {
-    let weekEndsAt = '';
-    return this.state.weeks
-      .map((day,index) => {
-        
+  // renderWeekData() {
+  //   let weekEndsAt = '';
+  //   return this.state.weeks
+  //     .map((day,index) => {
+      
 
-        switch (index) {
-          case 0:
-            weekEndsAt = day.weekEnding;
-            return;
-          case 1:
-            day.day = "Sunday";
-            break;
-          case 2:
-            day.day = "Monday";
-            break;
-          case 3:
-            day.day = "Tuesday";
-            break;
-          case 4:
-            day.day = "Wednesday";
-            break;
-          case 5:
-            day.day = "Thursday";
-            break;
-          case 6:
-            day.day = "Friday";
-            break;
-          case 7:
-            day.day = "Saturday";
-        }
-        day.date = moment(weekEndsAt).subtract(7-index,'days').format('MM/DD/YYYY');
-        if(day.startingTime !== ''){
-          var tempend = new Date(day.endingTime);
-          var tempstart = new Date(day.startingTime);
-          day.totalHours = tempend.getHours()-tempstart.getHours();
-          day.startingTimes = moment(day.startingTime).format('LT');
-        }
-        if(day.endingTime !== ''){
-          day.endingTimes = moment(day.endingTime).format('LT');
-        }
-        index = index + 1;
-        return (
-          day
-        );
-      }
+  //       switch (index) {
+  //         case 0:
+  //           weekEndsAt = day.weekEnding;
+  //           return;
+  //         case 1:
+  //           day.day = "Sunday";
+  //           break;
+  //         case 2:
+  //           day.day = "Monday";
+  //           break;
+  //         case 3:
+  //           day.day = "Tuesday";
+  //           break;
+  //         case 4:
+  //           day.day = "Wednesday";
+  //           break;
+  //         case 5:
+  //           day.day = "Thursday";
+  //           break;
+  //         case 6:
+  //           day.day = "Friday";
+  //           break;
+  //         case 7:
+  //           day.day = "Saturday";
+  //       }
+  //       day.date = moment(weekEndsAt).subtract(7-index,'days').format('MM/DD/YYYY');
+  //       if(day.startingTime !== ''){
+  //         var tempend = new Date(day.endingTime);
+  //         var tempstart = new Date(day.startingTime);
+  //         day.totalHours = tempend.getHours()-tempstart.getHours();
+  //         day.startingTimes = moment(day.startingTime).format('LT');
+  //       }
+  //       if(day.endingTime !== ''){
+  //         day.endingTimes = moment(day.endingTime).format('LT');
+  //       }
+  //       index = index + 1;
+  //       return (
+  //         day
+  //       );
+  //     }
 
-      )
-  }
+  //     )
+  // }
 
-  hide = () => {
-    this.setState({
-      visible: false,
-    });
-  };
+ 
 
-  handleVisibleChange = visible => {
-    this.setState({ visible });
-  };
-
-  handleOption = (summary) => (event) => {
-    let activeTab = this.props;
+  handleOption = (summary,option) => (event) => {
     console.log(summary.weekEnding);
-    localStorage.setItem("weekEnding", summary.weekEnding);
-    this.props.goto('2');
+    if(option === 'view'){
+      this.props.delivery('view',summary.weekEnding)
+      this.props.goto('2');
+    } else {
+      this.props.delivery('edit',summary.weekEnding)
+      this.props.goto('2');
+    }
+
   };
 
   renderTableData() {
@@ -437,31 +331,21 @@ export default class Summary extends Component {
       .map((summary, index) => {
         if (summary.submissionStatus === "Completed") {
           summary.option = (
-            <Popover
-             content={
-            <>
-            <Table columns={this.state.weekscolumns} dataSource={this.renderWeekData()}  pagination={{ position: ['none', 'none'] }}/>
-             <a onClick={this.hide}>Close</a>
-             </>
-            }
-            title="Details of Timesheet"
-            trigger="click"
-            visible={this.state.visible}
-            onVisibleChange={this.handleVisibleChange}
-            >
-            <Button type="primary" onClick={this.onClickView}>View</Button>
-            </Popover>
+            <a onClick={this.handleOption(summary,'view')}>
+            {" "}
+            View
+          </a>
           );
         } else if (summary.submissionStatus === "Incomplete") {
           summary.option = (
-            <a onClick={this.handleOption(summary)}>
+            <a onClick={this.handleOption(summary,'edit')}>
               {" "}
               Edit
             </a>
           );
         } else {
           summary.option = (
-            <a href="/timesheet" onClick={this.handleOption(summary)}>
+            <a onClick={this.handleOption(summary,'edit')}>
               {" "}
               Start
             </a>

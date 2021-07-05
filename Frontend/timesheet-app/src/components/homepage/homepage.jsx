@@ -22,7 +22,9 @@ export default class Homepage extends Component {
         super(props);
         this.state = {
             username: '',
-            activeTab: "1"
+            activeTab: "1",
+            option:"view",
+            weekEnding: ''
         };
     }
 
@@ -74,11 +76,11 @@ export default class Homepage extends Component {
     Demo = () => (
         <Tabs activeKey={this.state.activeTab} onChange={this.changeTab} type="card">
           <TabPane tab="Summary" key="1">
-            <Summary goto={this.changeTab}/>
+            <Summary goto={this.changeTab} delivery={this.messageDelivery} />
           </TabPane>
 
           <TabPane tab="Timesheet" key="2">
-            <Timesheet />
+            <Timesheet option={this.state.option} EndDate={this.state.weekEnding}/>
           </TabPane>
 
           <TabPane tab="Profile" key="3">
@@ -86,12 +88,21 @@ export default class Homepage extends Component {
           </TabPane>
         </Tabs>
     );
+    
+    messageDelivery = (option,weekEnding) => {
+        let opt = option;
+        let Enddate = weekEnding;
+        console.log(opt);
+        console.log(Enddate);
+        this.setState({weekEnding: Enddate});
+        this.setState({option: opt});
+    }
 
     changeTab = (activeKey) => {
+
         console.log(activeKey);
-        this.setState({
-          activeTab: activeKey
-        });
+        this.setState({activeTab: activeKey});
+        this.setState({option: activeKey});
     }
 
     logout = (item, key, keyPath, domEvent) => {
