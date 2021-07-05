@@ -5,12 +5,18 @@ import com.example.core1.domain.TimeSheetForSummary;
 import com.example.core1.domain.User;
 import com.example.core1.domain.EmergencyContact;
 import com.example.core1.domain.TimeSheet;
+import com.example.core1.file.AmazonS3FileService;
 import com.example.core1.service.ITestService;
 import com.example.core1.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +34,9 @@ public class TestController {
 
     @Autowired
     private IUserService iUserService;
+
+    @Autowired
+    private AmazonS3FileService amazonS3FileService;
 
     @GetMapping("/summary")
     public ResponseEntity<List<TimeSheetForSummary>> getListOfTimesheet(@RequestParam Map<String, String> username) {
@@ -82,5 +91,19 @@ public class TestController {
         System.out.println(params);
         Map<String, Object> resultMap = iUserService.getAllUsers();
         return ResponseEntity.ok(resultMap);
+    }
+
+    @GetMapping("/s3")
+    public Map<String, Object> testS3(){
+        amazonS3FileService.printOutName();
+        return new HashMap<String, Object>();
+    }
+
+    @PostMapping("/fileUploadWithForm")
+    public Map<String, Object> testFileUploadWithForm(@RequestPart("file") MultipartFile file,
+            @RequestParam Map<String, Object> paramMap){
+
+        Map<String, Object> resultMap = new HashMap<>();
+        return resultMap;
     }
 }
