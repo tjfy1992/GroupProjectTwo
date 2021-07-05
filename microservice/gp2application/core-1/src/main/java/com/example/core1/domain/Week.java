@@ -10,7 +10,6 @@ import org.bson.BsonTimestamp;
 @Builder
 @ToString
 public class Week {
-    private BsonTimestamp Weekending;
     private Day Sunday;
     private Day Monday;
     private Day Tuesday;
