@@ -1,40 +1,15 @@
 import React, { Component } from 'react'
 import { Table, DatePicker, Select, Checkbox, Radio, Button, InputNumber, Upload, message } from "antd";
-import { InboxOutlined } from '@ant-design/icons';
+import { UploadOutlined } from '@ant-design/icons';
+import axios from 'axios'
 import moment from 'moment';
 const dateFormat = 'DD MMMM YYYY';
-const { Dragger } = Upload;
+
 const { Option } = Select;
 const ALLOW_FILES = new Set(['image/JPEG', 'application/pdf',
 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 'application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword'
 ])
-const Fileprops = {
-    name: 'file',
-    multiple: true,
-    action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-    beforeUpload: file => {
-        if (!ALLOW_FILES.has(file.type)) {
-            message.error(`${file.name} can not be uploaded, only allow PDF, JPEG, Word, Excel files`);
-            return Upload.LIST_IGNORE
-        }
-        return true
-    },
-    onChange(info) {
-        const { status } = info.file;
-        if (status !== 'uploading') {
-            console.log(info.file, info.fileList);
-        }
-        if (status === 'done') {
-            message.success(`${info.file.name} file uploaded successfully.`);
-        } else if (status === 'error') {
-            message.error(`${info.file.name} file upload failed.`);
-        }
-    },
-    onDrop(e) {
-        console.log('Dropped files', e.dataTransfer.files);
-    },
-};
 const columns = [
     {
         title: 'Day',
@@ -297,10 +272,58 @@ export default class Timesheet extends Component {
         this.state = {
             endDate: getEndDate(),
             rows: [],
+            fileList: [],
             totalBill: 40,
             totalComposite: 40,
         };
     }
+
+    submitFile = () => {
+        console.log(this.state)
+        const formData = new FormData();
+        //for single file upload
+        formData.append('file', this.state.fileList[0]);
+        //add another parameter other than the file
+        formData.set("a", 1);
+        axios({
+            method: 'post',
+            url: 'http://localhost:9000/core/test/fileUploadWithForm',
+            data: formData,
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            },
+          })
+            .then((response) => {
+                console.log(response)
+            })
+            .catch((error) => {
+                console.log(error)
+        })
+    }
+
+    beforeUpload = (file) => {
+        if (!ALLOW_FILES.has(file.type)) {
+            message.error(`${file.name} can not be uploaded, only allow PDF, JPEG, Word, Excel files`);
+            return false
+        }
+        
+        console.log(file)
+        let files = [file];
+        this.setState({
+            fileList: [...files]
+        })
+        return false;
+   };
+
+    handleChange = (info) => {
+        if (info.file.status === 'uploading') {
+
+          return;
+        }
+        if (info.file.status === 'done') {
+          
+        }
+    };
 
     render() {
         return (
@@ -313,17 +336,11 @@ export default class Timesheet extends Component {
                 <Button>Set Default</Button>
                 <Table dataSource={this.state.rows} columns={columns} />;
                 {this.approveSelect}
-                {/* <Button>Choose File</Button> */}
-                <Dragger {...Fileprops}>
-                    <p className="ant-upload-drag-icon">
-                        <InboxOutlined />
-                    </p>
-                    <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                    <p className="ant-upload-hint">
-                        Support for a single or bulk upload. Strictly prohibit from uploading company data or other
-                        band files
-                    </p>
-                </Dragger>
+                <Upload 
+                    onChange={this.handleChange}
+                    beforeUpload={this.beforeUpload}>
+                    <Button icon={<UploadOutlined />}>Click to Upload</Button>
+                </Upload>
                 <Button>Save</Button>
             </div>
         )
