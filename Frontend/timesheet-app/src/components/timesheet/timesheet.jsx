@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Table, DatePicker, Select, Checkbox, Radio, Button, InputNumber, Upload, message } from "antd";
 import { UploadOutlined } from '@ant-design/icons';
+import './timesheet.css';
 import axios from 'axios'
 import moment from 'moment';
 const dateFormat = 'DD MMMM YYYY';
@@ -69,7 +70,7 @@ const holidayOptionDis = [
     //  Floating Day/Holiday/Vacation/default
     { label: 'Default', value: 0, disabled: true },
     { label: 'Floating Day', value: 1, disabled: true },
-    { label: 'Holiday', value: 2 },
+    { label: 'Holiday', value: 2, disabled: true  },
     { label: 'Vacation', value: 3, disabled: true },
 ];
 const workHourData = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
@@ -152,7 +153,7 @@ export default class Timesheet extends Component {
             options={holidayOption}
             onChange={(value) => { this.holidayValueChange(rowId, value) }}
             value={e.target.value}
-            optionType="button"
+            optionType="default"
             buttonStyle="solid" />
         this.setState(preRow)
     }
@@ -221,7 +222,7 @@ export default class Timesheet extends Component {
                     options={isHoliday ? holidayOptionDis : holidayOption}
                     onChange={(value) => { this.holidayValueChange(i, value) }}
                     value={isHoliday ? 2 : this.state.rows[i].holidayMeta}
-                    optionType="button"
+                    optionType="default"
                     buttonStyle="solid"
                 />
                 this.state.rows[i].totalHours = <InputNumber min={0} max={40} disabled={true} value={this.state.rows[i].workHourMeta} />
@@ -263,7 +264,8 @@ export default class Timesheet extends Component {
     }
 
     componentDidMount() {
-        this.updateDateArray()
+        this.updateDateArray();
+        //this.getTimesheetData();
     }
 
     constructor(props) {
@@ -333,16 +335,171 @@ export default class Timesheet extends Component {
 
                 Total Billing Hours:<InputNumber min={0} max={40} disabled={true} value={this.state.totalBill} defaultValue={40} />
                 Tolal Compensated Hours:<InputNumber min={0} max={40} disabled={true} value={this.state.totalComposite} defaultValue={40} />
-                <Button>Set Default</Button>
-                <Table dataSource={this.state.rows} columns={columns} />;
+                <br/>
+                <Button style={{float: 'right'}}>Set Default</Button>
+                <br/>
+                <br/>
+                <Table dataSource={this.state.rows} columns={columns} pagination={false}  />
                 {this.approveSelect}
+                &nbsp;
                 <Upload 
                     onChange={this.handleChange}
                     beforeUpload={this.beforeUpload}>
                     <Button icon={<UploadOutlined />}>Click to Upload</Button>
                 </Upload>
+                <br/>
                 <Button>Save</Button>
             </div>
         )
+    }
+
+    getTimesheetData = () => {
+        axios({
+            method: 'get',
+            url: 'http://localhost:9000/core/timesheet/timesheetList?username=zack&year=2021',
+          })
+            .then((response) => {
+                console.log(response)
+                this.updateData(response.data)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
+    updateData = (data) => {
+        let week = data.week;
+        console.log(week)
+        let dataArr = [];
+
+        //saturday
+        const dateObj = new Date(week.weekEnding);
+        let saturdayDate = moment(dateObj).format('MM/DD/YYYY');
+        let Saturday = {
+            date: saturdayDate,
+            dayStr: 'Saturday',
+            key: 1,
+            startTime: moment(new Date(week.saturday.startingTime.value)).format('hh:mm'),
+            endingTime: moment(new Date(week.saturday.endingTime.value)).format('hh:mm'),
+            workHourMeta: (week.saturday.endingTime.value - week.saturday.startingTime.value) / (1000 * 60 * 60 ),
+            isFloating: week.saturday.floatingDay,
+            isHoliday: week.saturday.holiday,
+            isVacation: week.saturday.vacation,
+        }
+        dataArr.push(Saturday)
+
+        //friday
+        dateObj.setDate(dateObj.getDate() - 1)
+        let fridayDate = moment(dateObj).format('MM/DD/YYYY')
+        let Friday = {
+            date: fridayDate,
+            dayStr: 'Friday',
+            key: 2,
+            startTime: moment(new Date(week.friday.startingTime.value)).format('hh:mm'),
+            endingTime: moment(new Date(week.friday.endingTime.value)).format('hh:mm'),
+            workHourMeta: (week.friday.endingTime.value - week.friday.startingTime.value) / (1000 * 60 * 60 ),
+            isFloating: week.friday.floatingDay,
+            isHoliday: week.friday.holiday,
+            isVacation: week.friday.vacation,
+        }
+        dataArr.push(Friday)
+
+        //thursday
+        dateObj.setDate(dateObj.getDate() - 1)
+        let thursdayDate = moment(dateObj).format('MM/DD/YYYY')
+        let Thursday = {
+            date: thursdayDate,
+            dayStr: 'Thursday',
+            key: 3,
+            startTime: moment(new Date(week.thursday.startingTime.value)).format('hh:mm'),
+            endingTime: moment(new Date(week.thursday.endingTime.value)).format('hh:mm'),
+            workHourMeta: (week.thursday.endingTime.value - week.thursday.startingTime.value) / (1000 * 60 * 60 ),
+            isFloating: week.thursday.floatingDay,
+            isHoliday: week.thursday.holiday,
+            isVacation: week.thursday.vacation,
+        }
+        dataArr.push(Thursday)
+
+        //wednesday
+        dateObj.setDate(dateObj.getDate() - 1)
+        let wednesdayDate = moment(dateObj).format('MM/DD/YYYY')
+        let Wednesday = {
+            date: wednesdayDate,
+            dayStr: 'Wednesday',
+            key: 4,
+            startTime: moment(new Date(week.wednesday.startingTime.value)).format('hh:mm'),
+            endingTime: moment(new Date(week.wednesday.endingTime.value)).format('hh:mm'),
+            workHourMeta: (week.wednesday.endingTime.value - week.wednesday.startingTime.value) / (1000 * 60 * 60 ),
+            isFloating: week.wednesday.floatingDay,
+            isHoliday: week.wednesday.holiday,
+            isVacation: week.wednesday.vacation,
+        }
+        dataArr.push(Wednesday)
+
+
+        //tuesday
+        dateObj.setDate(dateObj.getDate() - 1)
+        let tuesdayDate = moment(dateObj).format('MM/DD/YYYY')
+        let Tuesday = {
+            date: tuesdayDate,
+            dayStr: 'Tuesday',
+            key: 5,
+            startTime: moment(new Date(week.tuesday.startingTime.value)).format('hh:mm'),
+            endingTime: moment(new Date(week.tuesday.endingTime.value)).format('hh:mm'),
+            workHourMeta: (week.tuesday.endingTime.value - week.tuesday.startingTime.value) / (1000 * 60 * 60 ),
+            isFloating: week.tuesday.floatingDay,
+            isHoliday: week.tuesday.holiday,
+            isVacation: week.tuesday.vacation,
+        }
+        dataArr.push(Tuesday)
+
+        //monday
+        dateObj.setDate(dateObj.getDate() - 1)
+        let mondayDate = moment(dateObj).format('MM/DD/YYYY')
+        let Monday = {
+            date: mondayDate,
+            dayStr: 'Monday',
+            key: 6,
+            startTime: moment(new Date(week.monday.startingTime.value)).format('hh:mm'),
+            endingTime: moment(new Date(week.monday.endingTime.value)).format('hh:mm'),
+            workHourMeta: (week.monday.endingTime.value - week.monday.startingTime.value) / (1000 * 60 * 60 ),
+            isFloating: week.monday.floatingDay,
+            isHoliday: week.monday.holiday,
+            isVacation: week.monday.vacation,
+        }
+        dataArr.push(Monday)
+
+        //sunday
+        dateObj.setDate(dateObj.getDate() - 1)
+        let sundayDate = moment(dateObj).format('MM/DD/YYYY')
+        let Sunday = {
+            date: sundayDate,
+            dayStr: 'Sunday',
+            key: 7,
+            startTime: moment(new Date(week.sunday.startingTime.value)).format('hh:mm'),
+            endingTime: moment(new Date(week.sunday.endingTime.value)).format('hh:mm'),
+            workHourMeta: (week.sunday.endingTime.value - week.sunday.startingTime.value) / (1000 * 60 * 60 ),
+            isFloating: week.sunday.floatingDay,
+            isHoliday: week.sunday.holiday,
+            isVacation: week.sunday.vacation,
+        }
+        dataArr.push(Sunday)
+       
+        console.log(dataArr)
+        
+        this.setState({ rows: dataArr }, () => {
+            for (let i = 0; i < this.state.rows.length; i++) {
+                let item = this.state.rows[i];
+                let holidayValue = item.isFloating ? 1 : (item.isHoliday? 2 : (item.isVacation? 3: 0))
+                this.state.rows[i].holidayGroup = <Radio.Group
+                    options={holidayOptionDis}
+                    value={holidayValue}
+                    buttonStyle="solid"
+                />
+                this.state.rows[i].totalHours = <InputNumber min={0} max={40} disabled={true} value={this.state.rows[i].workHourMeta} />
+            }
+        });
+
+        console.log("changing data", this.state.rows)
     }
 }

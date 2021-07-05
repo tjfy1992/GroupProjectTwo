@@ -23,4 +23,17 @@ public class UserServiceImpl implements IUserService {
         resultMap.put("result", list);
         return resultMap;
     }
+
+    @Override
+    public User getUserByUsername(String username) {
+        List<User> users = iUserRepo.getUserTimesheetByUsername(username);
+        if(users.isEmpty())
+            return null;
+        return users.get(0);
+    }
+
+    @Override
+    public boolean updateTimeSheet(Map<String, Object> params) {
+        return false;
+    }
 }

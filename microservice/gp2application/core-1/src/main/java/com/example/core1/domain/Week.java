@@ -3,6 +3,8 @@ package com.example.core1.domain;
 import lombok.*;
 import org.bson.BsonTimestamp;
 
+import java.util.Date;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -10,7 +12,7 @@ import org.bson.BsonTimestamp;
 @Builder
 @ToString
 public class Week {
-    private BsonTimestamp Weekending;
+    private Date weekEnding;
     private Day Sunday;
     private Day Monday;
     private Day Tuesday;
