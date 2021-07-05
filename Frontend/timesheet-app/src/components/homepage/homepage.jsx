@@ -14,7 +14,6 @@ const { TabPane } = Tabs;
 const { SubMenu } = Menu;
 
 export default class Homepage extends Component {
-
     static contextTypes = {
         router: PropTypes.object.isRequired,
     }
@@ -22,7 +21,8 @@ export default class Homepage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            username: ''
+            username: '',
+            activeTab: "1"
         };
     }
 
@@ -72,13 +72,13 @@ export default class Homepage extends Component {
     }
 
     Demo = () => (
-        <Tabs defaultActiveKey="1" onChange={this.callback} type="card">
+        <Tabs activeKey={this.state.activeTab} onChange={this.changeTab} type="card">
           <TabPane tab="Summary" key="1">
-            <Summary/>
+            <Summary goto={this.changeTab}/>
           </TabPane>
 
           <TabPane tab="Timesheet" key="2">
-            <Timesheet/>
+            <Timesheet />
           </TabPane>
 
           <TabPane tab="Profile" key="3">
@@ -87,8 +87,11 @@ export default class Homepage extends Component {
         </Tabs>
     );
 
-    callback = (key) => {
-        console.log(key);
+    changeTab = (activeKey) => {
+        console.log(activeKey);
+        this.setState({
+          activeTab: activeKey
+        });
     }
 
     logout = (item, key, keyPath, domEvent) => {
