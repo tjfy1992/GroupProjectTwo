@@ -345,7 +345,7 @@ export default class Summary extends Component {
           );
         } else {
           summary.option = (
-            <a href="/timesheet" onClick={this.handleOption(summary,'edit')}>
+            <a onClick={this.handleOption(summary,'edit')}>
               {" "}
               Start
             </a>
