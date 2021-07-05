@@ -49,7 +49,7 @@ function disabledDate(current) {
 }
 
 function getEndDate(_today = new Date()) {
-    var today = new Date()
+    var today = _today
     var days = Math.abs(today.getDay() - 6)
     today.setDate(today.getDate() + days)
     console.log(moment(today).format(dateFormat))
@@ -159,17 +159,11 @@ export default class Timesheet extends Component {
 
     updateDateArray() {
         console.log("updating arr ", this.state.endDate)
-        // var summarydate = localStorage.getItem("weekEnding").split('/');
-        // var defaultdate = new Date(summarydate[2],summarydate[1],summarydate[0]);
-        var today = new Date();
-
+        let today = new Date()
         let arr = []
         let i = 1
         let monToday = moment(today).format('MM/DD/YYYY');
         let momentEndDate = moment(this.state.endDate).format('MM/DD/YYYY');
-        // if(defaultdate){
-        //     momentEndDate = moment(defaultdate).format('MM/DD/YYYY');
-        // }
         if (moment(momentEndDate).diff(moment(monToday), 'days') >= 7) {
             console.log("more than!!!")
             today.setDate(this.state.endDate.getDate() - 6)
