@@ -72,7 +72,7 @@ public class TestController {
 
 
 
-    @GetMapping("/profile")
+    /*@GetMapping("/profile")
     public ResponseEntity<User> getUserProfile(@RequestParam Map<String, String> username) {
         String uname = username.get("userName");
         List<TimeSheet> timeSheetList = new ArrayList<>();
@@ -88,11 +88,36 @@ public class TestController {
         }
         System.out.println(user.toString());
         return ResponseEntity.ok(user);
-    }
+    }*/
 
     @PostMapping(value="/updateprofile")
-    public ResponseEntity<Map<String, Object>> updateUserProfile(@RequestParam Map<String, Object> params){
+    public ResponseEntity<Map<String, Object>> updateUserProfile(@RequestParam Map<String, String> params){
         System.out.println(params);
+        //System.out.println(params.get("phone"));
+        String phone = params.get("phone");
+        String email = params.get("email");
+        String address = params.get("address");
+
+        String emergencyContact1Name = params.get("emergencyContact1Name");
+        String[] Name1Split = emergencyContact1Name.split("\\s+");
+        String contact1FirstName = "", contact1LastName = "";
+        if (Name1Split.length >= 2) {
+            contact1FirstName = Name1Split[0];
+            contact1LastName = Name1Split[1];
+        }
+        String emergencyContact1Phone = params.get("emergencyContact1Phone");
+
+        String emergencyContact2Name = params.get("emergencyContact2Name");
+        String[] Name2Split = emergencyContact2Name.split("\\s+");
+        String contact2FirstName = "", contact2LastName = "";
+        if (Name2Split.length >= 2) {
+            contact2FirstName = Name2Split[0];
+            contact2LastName = Name2Split[1];
+        }
+        String emergencyContact2Phone = params.get("emergencyContact2Phone");
+
+        //System.out.println(contact1FirstName + contact1LastName);
+
         Map<String, Object> resultMap = iUserService.getAllUsers();
         return ResponseEntity.ok(resultMap);
     }
