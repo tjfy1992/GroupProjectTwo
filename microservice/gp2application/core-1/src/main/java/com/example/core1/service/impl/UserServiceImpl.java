@@ -81,15 +81,6 @@ public class UserServiceImpl implements IUserService {
             return false;
         }
 
-        //check violation of floating days/vacation
-        int floatingDaysThisWeek = this.calculateFloatingDaysInAWeek(week);
-        int vacationDaysThisWeek = this.calculateVacationDaysInAWeek(week);
-        if(floatingDaysThisWeek > timeSheet.getRemainingFloatingDays()){
-            return false;
-        }
-        if(vacationDaysThisWeek > timeSheet.getRemainingVacationDays()){
-            return false;
-        }
         //update to timesheet
         AtomicInteger position2 = new AtomicInteger(-1);
         Week existedWeek = timeSheet.getWeeks().stream()
@@ -99,6 +90,27 @@ public class UserServiceImpl implements IUserService {
         if(existedWeek == null)
             return false;
         week.setStatus("Pending");
+
+        //check violation of floating days/vacation
+        int floatingDaysThisWeek = this.calculateFloatingDaysInAWeek(week);
+        int vacationDaysThisWeek = this.calculateVacationDaysInAWeek(week);
+
+        //existed week's floating days and vacation days
+        int floatingDaysInExistedWeek = this.calculateFloatingDaysInAWeek(existedWeek);
+        int vacationDaysInExistedWeek = this.calculateVacationDaysInAWeek(existedWeek);
+
+        if(floatingDaysThisWeek > timeSheet.getRemainingFloatingDays() + floatingDaysInExistedWeek){
+            return false;
+        }
+        if(vacationDaysThisWeek > timeSheet.getRemainingVacationDays() + vacationDaysInExistedWeek){
+            return false;
+        }
+
+        //update the remaining vacation days and floating days
+        user.getTimeSheets().get(position.get()).setRemainingVacationDays(
+                user.getTimeSheets().get(position.get()).getRemainingVacationDays() - vacationDaysThisWeek);
+        user.getTimeSheets().get(position.get()).setRemainingFloatingDays(
+                user.getTimeSheets().get(position.get()).getTotalFloatingDays() - floatingDaysThisWeek);
         user.getTimeSheets().get(position.get()).getWeeks().set(position2.get(), week);
         iUserRepo.save(user);
 
@@ -138,6 +150,12 @@ public class UserServiceImpl implements IUserService {
         week.setStatus("Pending");
         //add to timesheet
         timeSheet.getWeeks().add(week);
+
+        //update the remaining vacation days and floating days
+        user.getTimeSheets().get(position.get()).setRemainingVacationDays(
+                user.getTimeSheets().get(position.get()).getRemainingVacationDays() - vacationDaysThisWeek);
+        user.getTimeSheets().get(position.get()).setRemainingFloatingDays(
+                user.getTimeSheets().get(position.get()).getTotalFloatingDays() - floatingDaysThisWeek);
 
         user.getTimeSheets().set(position.get(), timeSheet);
         iUserRepo.save(user);

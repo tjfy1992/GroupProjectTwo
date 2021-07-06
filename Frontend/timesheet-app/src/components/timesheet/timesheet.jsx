@@ -273,7 +273,7 @@ export default class Timesheet extends Component {
     calTotalBillCopo() {
         let compensated = 0;
         let billCount = 0;
-        console.log(this.state.rows)
+        //console.log(this.state.rows)
         for (let i = 0; i < this.state.rows.length; i++) {
             //for weekdays
             if (this.state.rows[i].day !== 0 && this.state.rows[i].day !== 6) {
@@ -371,6 +371,7 @@ export default class Timesheet extends Component {
                 <br/>
                 <br/>
                 <Table dataSource={this.state.rows} columns={columns} pagination={false}  />
+                <br/>
                 {this.approveSelect()}
                 &nbsp;
                 <Upload 
@@ -394,23 +395,24 @@ export default class Timesheet extends Component {
             formData.append('file', this.state.fileList[0]);
         //add another parameter other than the file
         formData.set("endDate", endDate);
-        let days = []
+        //let days = []
         this.state.rows.forEach(item => {
             let newItem = {
                 'date': item.date,
                 'startingHour': item.startTimeMeta,
                 'endingHour': item.endTimeMeta,
                 'name': item.dayStr,
-                'isFloatingDay': item.holidayMeta === 1,
-                'isHoliday': item.holidayMeta === 2,
-                'isVacation': item.holidayMeta === 3
+                'isFloatingDay': item.holidayMeta === 0? false: (item.holidayMeta  === 1? true: item.isFloating),
+                'isHoliday': item.holidayMeta === 0? false: (item.holidayMeta === 2? true: item.isHoliday),
+                'isVacation': item.holidayMeta === 0? false: (item.holidayMeta === 3? true: item.isVacation)
             };
-            days.push(newItem)
+            //days.push(newItem)
+            console.log(item)
             formData.set(item.dayStr, JSON.stringify(newItem))
         })
         
         //if the user is updating a timesheet
-        if(this.state.isUpdating === false){
+        if(this.state.currentOperation === 'Update'){
             axios({
                 method: 'post',
                 url: 'http://localhost:9000/core/timesheet/updateTimesheet',
@@ -420,7 +422,11 @@ export default class Timesheet extends Component {
                 },
             })
                 .then((response) => {
-                    console.log(response)
+                    console.log(response);
+                    if(response.data.result === true)
+                        message.success('Timesheet updated successfully');
+                    else
+                    message.error('Ops, something went wrong.');
                 })
                 .catch((error) => {
                     console.log(error)
@@ -437,6 +443,10 @@ export default class Timesheet extends Component {
             })
                 .then((response) => {
                     console.log(response)
+                    if(response.data.result === true)
+                        message.success('Timesheet added successfully');
+                    else
+                        message.error('Ops, something went wrong.');
                 })
                 .catch((error) => {
                     console.log(error)
@@ -445,6 +455,10 @@ export default class Timesheet extends Component {
     }
 
     setDefault = () => {
+        // if(this.state.currentOperation === "Add"){
+        //     this.updateDateArray();
+        //     return;
+        // }
         this.updateArrayBySelectingDate(moment(this.state.endDate).format('MM/DD/YYYY'))
     }
 
@@ -745,7 +759,7 @@ export default class Timesheet extends Component {
                 let holidayValue = item.isFloating ? 1 : (item.isHoliday? 2 : (item.isVacation? 3: 0))
 
                 this.state.rows[i].holidayGroup = <Radio.Group
-                    options={item.isHoliday ? holidayOptionDis : holidayOption}
+                    options={(i ===0 || i === 6) ? holidayOptionDis : holidayOption}
                     onChange={(value) => { this.holidayValueChange(i, value) }}
                     value={holidayValue}
                     optionType="default"

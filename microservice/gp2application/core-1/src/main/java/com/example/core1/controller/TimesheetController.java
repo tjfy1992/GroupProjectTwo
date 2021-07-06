@@ -42,14 +42,16 @@ public class TimesheetController {
     @PostMapping("/updateTimesheet")
     public Map<String, Object> updateTimesheet(@RequestParam Map<String, Object> params) {
         Map<String, Object> resultMap = new HashMap<>();
-        iUserService.updateTimeSheet(params);
+        boolean result = iUserService.updateTimeSheet(params);
+        resultMap.put("result", result);
         return resultMap;
     }
 
     @PostMapping("/addTimesheet")
     public Map<String, Object> addTimesheet(@RequestParam Map<String, Object> params) {
         Map<String, Object> resultMap = new HashMap<>();
-        iUserService.addTimesheet(params);
+        boolean result = iUserService.addTimesheet(params);
+        resultMap.put("result", result);
         return resultMap;
     }
 
