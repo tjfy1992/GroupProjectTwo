@@ -26,8 +26,8 @@ import java.util.Map;
 @RequestMapping("/core/test")
 public class TestController {
 
-    @Autowired
-    private TimeSheetRepo timesheetRepo;
+//    @Autowired
+//    private TimeSheetRepo timesheetRepo;
 
     @Autowired
     private ITestService iTestService;

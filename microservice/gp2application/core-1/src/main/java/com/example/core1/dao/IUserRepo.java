@@ -9,4 +9,8 @@ import java.util.List;
 public interface IUserRepo extends MongoRepository<User, String> {
     @Query(value="{ 'username' : ?0 }")
     List<User> userInfo(String username);
+
+    @Query(value="{ 'username' : ?0 }", fields="{ 'timeSheets' : 1, 'username' : 2}")
+    List<User> getUserTimesheetByUsername(String username);
+
 }
