@@ -7,6 +7,7 @@ import Timesheet from '../timesheet/timesheet';
 import { Layout, Menu } from 'antd';
 import PropTypes from 'prop-types';
 import axios from 'axios'
+import jwt from 'jwt-decode'
 
 const { Header, Content, Footer } = Layout;
 
@@ -32,7 +33,11 @@ export default class Homepage extends Component {
     componentDidMount(){
         this.testGet();
         this.getUserInfo();
-        this.setState({username: localStorage.getItem('username')});
+        var token = localStorage.getItem('token');
+        var decodedusername = jwt(token).sub.split(',')[1].substring(jwt(token).sub.split(',')[1].lastIndexOf("=") + 1, jwt(token).sub.split(',')[1].lastIndexOf("}"));
+        this.setState({username: decodedusername});
+
+        console.log(decodedusername);
     }
 
     testGet = () => {

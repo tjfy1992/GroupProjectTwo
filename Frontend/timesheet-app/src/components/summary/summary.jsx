@@ -213,18 +213,25 @@ export default class Summary extends Component {
     this.state.tempsummarys
       .slice(0, this.state.count)
       .forEach((sheet,index) => {
-        var ary = {Year: '',weekEnding : "", totalHours : 0, submissionStatus : '', approvalStatus : '', option : '', usedfloatingday: 0, holiday :'', usedvacationday : 0};
-        ary.Year = sheet.year;
+        var ary = {Year: '',weekEnding : "", totalHours : 0, submissionStatus : '', approvalStatus : '', option : '', usedfloatingday: 0, holiday :0, usedvacationday : 0};
         ary.usedfloatingday = 3-sheet.remainingFloatingDays;
         ary.holiday = 0;
         ary.usedvacationday = 3-sheet.remainingVacationDays;
-        if(sheet.submissionStatus != undefined){
-          ary.submissionStatus = sheet.submissionStatus;
-        } else {
+        
+        sheet.weeks.forEach((week,index) => {
+        ary = {Year: '',weekEnding : "", totalHours : 0, submissionStatus : '', approvalStatus : '', option : '', usedfloatingday: ary.usedfloatingday, holiday :ary.holiday, usedvacationday : ary.usedvacationday}          
+        ary.Year = sheet.year;
+        console.log(ary.usedfloatingday,ary.usedvacationday,ary.holiday);
+        if(week.status === "Pending"){
           ary.submissionStatus = 'Incomplete';
+        } else if(week.status === 'Approved'){
+          ary.submissionStatus = 'Completed';
+        } else {
+          week.status = 'N/A'
+          ary.submissionStatus = 'Not Started';
         }
-        if(sheet.approvalStatus != undefined){
-          ary.approvalStatus = sheet.approvalStatus;
+        if(week.status != ''){
+          ary.approvalStatus = week.status;
         } else {
           ary.approvalStatus = 'Not approved';
         }
@@ -250,58 +257,46 @@ export default class Summary extends Component {
             </a>
           );
         }
-        sheet.weeks.forEach((week,index) => {
-          console.log(week);
+          
+          ary.totalHours=0
           if(week.weekEnding != undefined){
-            ary.weekEnding = moment(week.weekEnding).format('MM/DD/YYYY');
+            ary.weekEnding='';
+            var date = new Date(week.weekEnding);
+            ary.weekEnding=((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + ((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())) + '/' + date.getFullYear();
           } 
-          if (week.sunday.startingTime.value != undefined){
-            var tempend = new Date(moment(week.sunday.endingTime.value));
-            var tempstart = new Date(moment(week.sunday.startingTime.value));
-            ary.totalHours += tempend.getHours()-tempstart.getHours();;
+          if (week.sunday.startingTime != -1){
+            ary.totalHours += week.sunday.endingTime-week.sunday.startingTime;
           }
-          if (week.monday.startingTime.value != undefined){
-            var tempend = new Date(moment(week.monday.endingTime.value));
-            var tempstart = new Date(moment(week.monday.startingTime.value));
-            ary.totalHours += tempend.getHours()-tempstart.getHours();
+          if (week.monday.startingTime != -1){
+            ary.totalHours += week.monday.endingTime-week.monday.startingTime;
           }
-          if (week.tuesday.startingTime.value != undefined){
-            var tempend = new Date(moment(week.tuesday.endingTime.value));
-            var tempstart = new Date(moment(week.tuesday.startingTime.value));
-            ary.totalHours += tempend.getHours()-tempstart.getHours();
+          if (week.tuesday.startingTime != -1){
+            ary.totalHours += week.tuesday.endingTime-week.tuesday.startingTime;
           }
-          if (week.wednesday.startingTime.value != undefined){
-            var tempend = new Date(moment(week.wednesday.endingTime.value));
-            var tempstart = new Date(moment(week.wednesday.startingTime));
-            ary.totalHours += tempend.getHours()-tempstart.getHours();
+          if (week.wednesday.startingTime!= -1){
+            ary.totalHours += week.wednesday.endingTime-week.wednesday.startingTime;
           }
-          if (week.thursday.startingTime.value != undefined){
-            var tempend = new Date(moment(week.thursday.endingTime));
-            var tempstart = new Date(moment(week.thursday.startingTime));
-            ary.totalHours += tempend.getHours()-tempstart.getHours();
+          if (week.thursday.startingTime != -1){
+            ary.totalHours += week.thursday.endingTime-week.thursday.startingTime;
           }
-          if (week.friday.startingTime.value != undefined){
-            var tempend = new Date(moment(week.friday.endingTime));
-            var tempstart = new Date(moment(week.friday.startingTime));
-            ary.totalHours += tempend.getHours()-tempstart.getHours();
+          if (week.friday.startingTime!= -1){
+            ary.totalHours += week.friday.endingTime-week.friday.startingTime;
           }
-          if (week.saturday.startingTime.value != undefined){
-            var tempend = new Date(moment(week.saturday.endingTime));
-            var tempstart = new Date(moment(week.saturday.startingTime));
-            ary.totalHours += tempend.getHours()-tempstart.getHours();
+          if (week.saturday.startingTime!= -1){
+            ary.totalHours += week.saturday.endingTime-week.saturday.startingTime;
           }
           index += 1;
+          arys.push(ary)
+          // ary = {Year: '',weekEnding : "", totalHours : 0, submissionStatus : '', approvalStatus : '', option : '', usedfloatingday: 0, holiday :0, usedvacationday : 0};
           return (week,ary.totalHours);
         })
         console.log(index);
-        arys.push(ary)
+        console.log(sheet);
         return (
           sheet
         );
-    return;
-
       }
-
+      
       )
       return (arys)
   }
