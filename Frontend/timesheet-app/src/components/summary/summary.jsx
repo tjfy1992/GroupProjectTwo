@@ -1,61 +1,9 @@
 import React, { Component } from 'react'
-import {Button, Table, Tag, Space, Badge,Tooltip} from 'antd';
+import {Popover, Button, Table, Tag, Space, Badge,Tooltip} from 'antd';
 import {InfoCircleTwoTone} from '@ant-design/icons';
 import axios from 'axios';
+import moment from 'moment';
 
-
-const data = [{
-
-  weekEnding: '3/24/2018', 
-  totalHours: 40, 
-  submissionStatus: 'Not Started', 
-  approvalStatus: 'N/A', 
-  usedfloatingday: 2,
-  holiday: 2,
-  usedvacationday: 2,
-
-},
-{
-
-  weekEnding: '3/29/2018', 
-  totalHours: 30, 
-  submissionStatus: 'Incomplete', 
-  approvalStatus: 'Not approved', 
-  usedfloatingday: 3,
-  holiday: 0,
-  usedvacationday: 1,
-
-},
-{
-
-  weekEnding: '3/21/2018', 
-  totalHours: 40, 
-  submissionStatus: 'Completed', 
-  approvalStatus: 'Approved', 
-  usedfloatingday: 0,
-  holiday: 0,
-  usedvacationday: 0,
-},
-{ 
-  weekEnding: '2/24/2018', 
-  totalHours: 20, 
-  submissionStatus: 'Completed', 
-  approvalStatus: 'N/A', 
-  usedfloatingday: 0,
-  holiday: 1,
-  usedvacationday: 3,
-},
-{
-
-  weekEnding: '1/29/2018', 
-  totalHours: 10, 
-  submissionStatus: 'Incomplete', 
-  approvalStatus: 'N/A', 
-  usedfloatingday: 2,
-  holiday: 0,
-  usedvacationday: 1,
-},
-];
 
 const columns = [
   {
@@ -157,36 +105,40 @@ const columns = [
   {
     title: 'Option',
     key: 'option',
-    render: (record) => {
-      var text;
-      if(record.submissionStatus === 'Completed'){
-        text = <a>View</a>;
-      } else {
-        text = <a>Edit</a>;
-      }
-     return( <Space size="middle">
-        {text}
-      </Space>
-     )
-    },
+    dataIndex: 'option',
+    // render: (record) => {
+    //   var text;
+    //   if(record.submissionStatus === 'Completed'){
+    //     text = <a>View</a>;
+    //     return( <Space size="middle">
+    //     {text}
+    //   </Space>
+    //  )
+    //   } else {
+    //     text = <a>Edit</a>;
+    //     return( <Space size="middle">
+    //     {text}
+    //   </Space>
+    //  )
+    //   }
+    // },
   },
   {
     title: 'Comments',
     key: 'Comments',
-    
     render: (record) => {
-      let fdayleft = 3-record.usedfloatingday;
-      let vdayleft = 3-record.usedvacationday;
+      var fdayleft = 3-record.usedfloatingday;
+      var vdayleft = 3-record.usedvacationday;
       var comment = '',reminder = '',badge = '',finalreminder = '',finalcomment = '';
       var fcomment = record.usedfloatingday+' floating days required\r';
       var vcomment = record.usedvacationday+' vacation days required\r';
       var hcomment = record.holiday+' holidays included\r';
       var freminder = 'Total floating days left ' + fdayleft +' days\r';
       var vreminder = 'Total vacation days left ' + vdayleft +' days\r';
-      finalreminder += record.usedfloatingday === 0? '':freminder+'. ';
-      finalreminder += record.usedvacationday === 0? '':vreminder+'. ';
-      finalcomment += record.usedfloatingday === 0? '':fcomment+'. ';
-      finalcomment += record.usedvacationday === 0? '':vcomment+'. ';
+      finalreminder += record.usedfloatingday == 0? '':freminder+'. ';
+      finalreminder += record.usedvacationday == 0? '':vreminder+'. ';
+      finalcomment += record.usedfloatingday == 0? '':fcomment+'. ';
+      finalcomment += record.usedvacationday == 0? '':vcomment+'. ';
       finalcomment += record.holiday === 0? '':hcomment+'. ';
       if (finalcomment !== '') {
         comment = finalcomment;
@@ -207,31 +159,31 @@ const columns = [
   },
 ];
   
-  
+
 
 export default class Summary extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      summarys: [],
-      fordisplay:[],
+      tempsummarys:[],
       summarycolumns:[],
-      count: 2,
+      count: 1,
       show: "Show More",
+      userInfos: [],
     };
   }
 
 
   
     handleShowMore = () => {
-      if (this.state.summarys.length - this.state.count < 2 && this.state.count !== this.state.summarys.length ) {
+      if (this.state.tempsummarys.length - this.state.count < 2 && this.state.count !== this.state.tempsummarys.length ) {
         this.setState({
-          count: this.state.summarys.length,
+          count: this.state.tempsummarys.length,
           show: "Hide All",
         });
-      } else if(this.state.count === this.state.summarys.length){
+      } else if(this.state.count === this.state.tempsummarys.length){
         this.setState({
-          count: 2,
+          count: 1,
           show: "Show More",
         });
       } else {
@@ -242,49 +194,220 @@ export default class Summary extends Component {
       }
     };
 
-  componentDidMount() {
+   componentDidMount=()=> {
     this.setState({summarycolumns: columns});
-    // this.setState({summarys: data});
-    // localStorage.setItem('username', 'zack');
-    // let userName = localStorage.getItem("username");
-      axios
-      .get('http://localhost:9000/core/test/summary?unsername=zack')
-      .then(e => this.setState({summarys: e.data}))
-      
-      // ({
-      //       method: 'get',
-      //       url: 'https://localhost:9000/core/test/summary',
-      //       params:{
-      //         username  : 'zack'
-      //       }
-      //     })
-      //       .then((response) => {
-      //         const summaryss = response.data;
-      //         this.setState({summarys:summaryss});
-      //           console.log(response)
-      //       })
-      //       .catch((error) => {
-      //           console.log(error)
-      //   })
+    this.componentDidUpdate(this.props);
   }
-  
-  renderTableData() {
-    return this.state.summarys
+
+  componentDidUpdate (prevProps) {
+    if(prevProps.userInfo != this.props.userInfo || !prevProps){
+      this.setState({userInfos: this.props.userInfo},()=>{ this.setState({tempsummarys: this.state.userInfos.user.timeSheets})})
+    }
+    
+    console.log(this.renderRawData());
+
+  }
+
+  renderRawData =() =>{
+    var arys = [];
+    this.state.tempsummarys
       .slice(0, this.state.count)
-      .map((summary, index) => {
-      
+      .forEach((sheet,index) => {
+        var ary = {Year: '',weekEnding : "", totalHours : 0, submissionStatus : '', approvalStatus : '', option : '', usedfloatingday: 0, holiday :'', usedvacationday : 0};
+        ary.Year = sheet.year;
+        ary.usedfloatingday = 3-sheet.remainingFloatingDays;
+        ary.holiday = 0;
+        ary.usedvacationday = 3-sheet.remainingVacationDays;
+        if(sheet.submissionStatus != undefined){
+          ary.submissionStatus = sheet.submissionStatus;
+        } else {
+          ary.submissionStatus = 'Incomplete';
+        }
+        if(sheet.approvalStatus != undefined){
+          ary.approvalStatus = sheet.approvalStatus;
+        } else {
+          ary.approvalStatus = 'Not approved';
+        }
+        if (ary.submissionStatus === "Completed") {
+          ary.option = (
+            <a onClick={this.handleOption(sheet,'view')}>
+            {" "}
+            View
+          </a>
+          );
+        } else if (ary.submissionStatus === "Incomplete") {
+          ary.option = (
+            <a onClick={this.handleOption(sheet,'edit')}>
+              {" "}
+              Edit
+            </a>
+          );
+        } else {
+          ary.option = (
+            <a onClick={this.handleOption(sheet,'edit')}>
+              {" "}
+              Start
+            </a>
+          );
+        }
+        sheet.weeks.forEach((week,index) => {
+          console.log(week);
+          if(week.weekEnding != undefined){
+            ary.weekEnding = moment(week.weekEnding).format('MM/DD/YYYY');
+          } 
+          if (week.sunday.startingTime.value != undefined){
+            var tempend = new Date(moment(week.sunday.endingTime.value));
+            var tempstart = new Date(moment(week.sunday.startingTime.value));
+            ary.totalHours += tempend.getHours()-tempstart.getHours();;
+          }
+          if (week.monday.startingTime.value != undefined){
+            var tempend = new Date(moment(week.monday.endingTime.value));
+            var tempstart = new Date(moment(week.monday.startingTime.value));
+            ary.totalHours += tempend.getHours()-tempstart.getHours();
+          }
+          if (week.tuesday.startingTime.value != undefined){
+            var tempend = new Date(moment(week.tuesday.endingTime.value));
+            var tempstart = new Date(moment(week.tuesday.startingTime.value));
+            ary.totalHours += tempend.getHours()-tempstart.getHours();
+          }
+          if (week.wednesday.startingTime.value != undefined){
+            var tempend = new Date(moment(week.wednesday.endingTime.value));
+            var tempstart = new Date(moment(week.wednesday.startingTime));
+            ary.totalHours += tempend.getHours()-tempstart.getHours();
+          }
+          if (week.thursday.startingTime.value != undefined){
+            var tempend = new Date(moment(week.thursday.endingTime));
+            var tempstart = new Date(moment(week.thursday.startingTime));
+            ary.totalHours += tempend.getHours()-tempstart.getHours();
+          }
+          if (week.friday.startingTime.value != undefined){
+            var tempend = new Date(moment(week.friday.endingTime));
+            var tempstart = new Date(moment(week.friday.startingTime));
+            ary.totalHours += tempend.getHours()-tempstart.getHours();
+          }
+          if (week.saturday.startingTime.value != undefined){
+            var tempend = new Date(moment(week.saturday.endingTime));
+            var tempstart = new Date(moment(week.saturday.startingTime));
+            ary.totalHours += tempend.getHours()-tempstart.getHours();
+          }
+          index += 1;
+          return (week,ary.totalHours);
+        })
+        console.log(index);
+        arys.push(ary)
         return (
-          summary
+          sheet
         );
-      });
+    return;
+
+      }
+
+      )
+      return (arys)
   }
+
+  // renderWeekData() {
+  //   let weekEndsAt = '';
+  //   return this.state.weeks
+  //     .map((day,index) => {
+      
+
+  //       switch (index) {
+  //         case 0:
+  //           weekEndsAt = day.weekEnding;
+  //           return;
+  //         case 1:
+  //           day.day = "Sunday";
+  //           break;
+  //         case 2:
+  //           day.day = "Monday";
+  //           break;
+  //         case 3:
+  //           day.day = "Tuesday";
+  //           break;
+  //         case 4:
+  //           day.day = "Wednesday";
+  //           break;
+  //         case 5:
+  //           day.day = "Thursday";
+  //           break;
+  //         case 6:
+  //           day.day = "Friday";
+  //           break;
+  //         case 7:
+  //           day.day = "Saturday";
+  //       }
+  //       day.date = moment(weekEndsAt).subtract(7-index,'days').format('MM/DD/YYYY');
+  //       if(day.startingTime !== ''){
+  //         var tempend = new Date(day.endingTime);
+  //         var tempstart = new Date(day.startingTime);
+  //         day.totalHours = tempend.getHours()-tempstart.getHours();
+  //         day.startingTimes = moment(day.startingTime).format('LT');
+  //       }
+  //       if(day.endingTime !== ''){
+  //         day.endingTimes = moment(day.endingTime).format('LT');
+  //       }
+  //       index = index + 1;
+  //       return (
+  //         day
+  //       );
+  //     }
+
+  //     )
+  // }
+
+
+  handleOption = (summary,option) => (event) => {
+    console.log(summary.weekEnding);
+    if(option === 'view'){
+      this.props.delivery('view',summary.weekEnding)
+      this.props.goto('2');
+    } else {
+      this.props.delivery('edit',summary.weekEnding)
+      this.props.goto('2');
+    }
+
+  };
+
+  // renderTableData =() => {
+    
+  //   return this.state.summarys
+  //     .slice(0, this.state.count)
+  //     .map((summary, index) => {
+  //       if (summary.submissionStatus === "Completed") {
+  //         summary.option = (
+  //           <a onClick={this.handleOption(summary,'view')}>
+  //           {" "}
+  //           View
+  //         </a>
+  //         );
+  //       } else if (summary.submissionStatus === "Incomplete") {
+  //         summary.option = (
+  //           <a onClick={this.handleOption(summary,'edit')}>
+  //             {" "}
+  //             Edit
+  //           </a>
+  //         );
+  //       } else {
+  //         summary.option = (
+  //           <a onClick={this.handleOption(summary,'edit')}>
+  //             {" "}
+  //             Start
+  //           </a>
+  //         );
+  //       }
+  //       return (
+  //         summary
+  //       );
+  //     });
+  // }
 
     render() {
         return (
 
             <div>
                 
-                <Table columns={this.state.summarycolumns} dataSource={this.renderTableData()}  pagination={{ position: ['none', 'none'] }}/>
+                <Table columns={this.state.summarycolumns} dataSource={this.renderRawData()}  pagination={{ position: ['none', 'none'] }}/>
                 <Button type="primary" shape="round" onClick={this.handleShowMore}>
                 {this.state.show}
                 </Button>

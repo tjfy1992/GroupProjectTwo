@@ -14,7 +14,6 @@ const { TabPane } = Tabs;
 const { SubMenu } = Menu;
 
 export default class Homepage extends Component {
-
     static contextTypes = {
         router: PropTypes.object.isRequired,
     }
@@ -22,12 +21,17 @@ export default class Homepage extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            username: ''
+            username: '',
+            activeTab: "1",
+            option:"view",
+            weekEnding: '',
+            user:[],
         };
     }
 
     componentDidMount(){
         this.testGet();
+        this.getUserInfo();
         this.setState({username: localStorage.getItem('username')});
     }
 
@@ -38,6 +42,21 @@ export default class Homepage extends Component {
           })
             .then((response) => {
                 console.log(response)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
+    getUserInfo()  {
+        axios({
+            method: 'get',
+            url: 'http://localhost:9000/core/test/getuserinfo?username='+localStorage.getItem('username'),
+          })
+            .then((response) => {
+                this.setState(
+                    {user:response.data}, ()=>console.log('at homepage',this.state.user)
+                )
             })
             .catch((error) => {
                 console.log(error)
@@ -72,23 +91,34 @@ export default class Homepage extends Component {
     }
 
     Demo = () => (
-        <Tabs defaultActiveKey="1" onChange={this.callback} type="card">
+        <Tabs activeKey={this.state.activeTab} onChange={this.changeTab} type="card">
           <TabPane tab="Summary" key="1">
-            <Summary/>
+            <Summary goto={this.changeTab} delivery={this.messageDelivery} userInfo={this.state.user}/>
           </TabPane>
 
           <TabPane tab="Timesheet" key="2">
-            <Timesheet/>
+            <Timesheet option={this.state.option} EndDate={this.state.weekEnding}/>
           </TabPane>
 
           <TabPane tab="Profile" key="3">
-            <Profile/>
+            <Profile userProfile={this.state.user} />
           </TabPane>
         </Tabs>
     );
+    
+    messageDelivery = (option,weekEnding) => {
+        let opt = option;
+        let Enddate = weekEnding;
+        console.log(opt);
+        console.log(Enddate);
+        this.setState({weekEnding: Enddate});
+        this.setState({option: opt});
+    }
 
-    callback = (key) => {
-        console.log(key);
+    changeTab = (activeKey) => {
+        console.log(activeKey);
+        this.setState({activeTab: activeKey});
+        this.setState({option: activeKey});
     }
 
     logout = (item, key, keyPath, domEvent) => {

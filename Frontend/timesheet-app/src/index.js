@@ -20,8 +20,10 @@ axios.interceptors.request.use(
     }
 
     if (config.method === "post"){
-        config.data = qs.stringify(config.data);
-        config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+        if(config.headers['Content-Type'] !== 'multipart/form-data'){
+          config.data = qs.stringify(config.data);
+          config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+        }  
     }
     return config;
   },
