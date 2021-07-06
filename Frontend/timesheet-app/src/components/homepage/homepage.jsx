@@ -55,9 +55,8 @@ export default class Homepage extends Component {
           })
             .then((response) => {
                 this.setState(
-                    {user:response.data}
+                    {user:response.data}, ()=>console.log('at homepage',this.state.user)
                 )
-                console.log(this.state.user.user.timeSheets);
             })
             .catch((error) => {
                 console.log(error)

@@ -14,4 +14,7 @@ public class TimeSheet {
     private String year;
     private Integer totalFloatingDays;
     private List<Week> weeks;
+    private Integer remainingFloatingDays;
+    private Integer remainingVacationDays;
+    private Integer Holidays;
 }
