@@ -38,6 +38,20 @@ public class TestController {
     @Autowired
     private AmazonS3FileService amazonS3FileService;
 
+
+    @GetMapping("/getuserinfo")
+    public ResponseEntity<Map<String, Object>> getUserInfo(@RequestParam Map<String, Object> params) {
+        if(params.get("username") == null){
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("result", "failed");
+            return ResponseEntity.ok(resultMap);
+        }
+        Map<String, Object> map =  iUserService.userInfo(params);
+        User user = (User) map.get("user");
+        System.out.println(user);
+        return ResponseEntity.ok(map);
+    }
+
     @GetMapping("/summary")
     public ResponseEntity<List<TimeSheetForSummary>> getListOfTimesheet(@RequestParam Map<String, String> username) {
 //        List<TimeSheetForSummary> list = timesheetRepo.findAllByUserName(username);
@@ -56,23 +70,7 @@ public class TestController {
         return ResponseEntity.ok(list);
     }
 
-//    @GetMapping("/gettimesheet")
-//    public ResponseEntity<Week> getWeek(@RequestParam Map<String, String> weekending) {
-//        String weekendat = weekending.get("weekEnding");
-//        Day sun = new Day();
-//        Day mon = new Day();
-//        Day tue = new Day();
-//        Day wed = new Day();
-//        Day thu = new Day();
-//        Day fri = new Day();
-//        Day sat = new Day();
-//        BsonTimestamp bt = BsonTimestamp(1617163200000);
-//
-//        Week result = new Week(1617163200000,sun,mon,tue,wed,thu,fri,sat);
-//
-//        System.out.println(result.toString());
-//        return ResponseEntity.ok(result);
-//    }
+
 
     @GetMapping("/profile")
     public ResponseEntity<User> getUserProfile(@RequestParam Map<String, String> username) {

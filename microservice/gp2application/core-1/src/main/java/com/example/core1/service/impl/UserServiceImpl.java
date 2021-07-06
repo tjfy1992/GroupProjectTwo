@@ -17,6 +17,21 @@ public class UserServiceImpl implements IUserService {
     private IUserRepo iUserRepo;
 
     @Override
+    public Map<String, Object> userInfo(Map<String, Object> param) {
+        Map<String, Object> resultMap = new HashMap<>();
+        String username = param.get("username").toString();
+        List<User> list = iUserRepo.userInfo(username);
+        if(list.isEmpty()){
+            resultMap.put("result", "failed");
+            return resultMap;
+        }
+        User user = list.get(0);
+        resultMap.put("result", "successful");
+        resultMap.put("user", user);
+        return resultMap;
+    }
+
+    @Override
     public Map<String, Object> getAllUsers() {
         Map<String, Object> resultMap = new HashMap<>();
         List<User> list = iUserRepo.findAll();

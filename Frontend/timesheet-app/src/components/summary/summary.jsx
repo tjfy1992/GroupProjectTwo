@@ -220,11 +220,12 @@ export default class Summary extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      tempsummarys:[],
       summarys: [],
-      fordisplay:[],
       summarycolumns:[],
       count: 2,
       show: "Show More",
+      userInfos: this.props.userInfo,
     };
   }
 
@@ -250,16 +251,40 @@ export default class Summary extends Component {
     };
 
   componentDidMount() {
-
     this.setState({summarycolumns: columns});
-    // this.setState({summarys: data});
-    // localStorage.setItem('username', 'zack');
-    // let userName = localStorage.getItem("username");
-      axios
+    console.log(this.state.userInfos);
+    this.setState({tempsummarys: this.state.userInfos.user.timeSheets},() => console.log(this.state.tempsummarys));
+    axios
       .get('http://localhost:9000/core/test/summary?unsername=zack')
       .then(e => this.setState({summarys: e.data}))
   }
 
+  // renderRawData() {
+  //   let weekEndsAt = '';
+  //   return this.state.tempsummarys
+  //     .map((sheet,index) => {
+  //       sheet.map((week,index) => {
+  //         let weekEndsAt = week.Saturday.ending;
+  //       })
+        
+  //       day.date = moment(weekEndsAt).subtract(7-index,'days').format('MM/DD/YYYY');
+  //       if(day.startingTime !== ''){
+  //         var tempend = new Date(day.endingTime);
+  //         var tempstart = new Date(day.startingTime);
+  //         day.totalHours = tempend.getHours()-tempstart.getHours();
+  //         day.startingTimes = moment(day.startingTime).format('LT');
+  //       }
+  //       if(day.endingTime !== ''){
+  //         day.endingTimes = moment(day.endingTime).format('LT');
+  //       }
+  //       index = index + 1;
+  //       return (
+  //         day
+  //       );
+  //     }
+
+  //     )
+  // }
 
   // renderWeekData() {
   //   let weekEndsAt = '';
@@ -311,7 +336,6 @@ export default class Summary extends Component {
   //     )
   // }
 
- 
 
   handleOption = (summary,option) => (event) => {
     console.log(summary.weekEnding);
