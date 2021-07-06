@@ -253,7 +253,7 @@ export default class Summary extends Component {
   componentDidMount() {
     this.setState({summarycolumns: columns});
     console.log(this.state.userInfos);
-    this.setState({tempsummarys: this.state.userInfos.user.timeSheets},() => console.log(this.state.tempsummarys));
+    // this.setState({tempsummarys: this.state.userInfos.user.timeSheets},() => console.log(this.state.tempsummarys));
     axios
       .get('http://localhost:9000/core/test/summary?unsername=zack')
       .then(e => this.setState({summarys: e.data}))
