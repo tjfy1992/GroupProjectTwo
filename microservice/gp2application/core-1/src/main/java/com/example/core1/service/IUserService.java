@@ -1,6 +1,7 @@
 package com.example.core1.service;
 
 import com.example.core1.domain.User;
+import com.example.core1.domain.Week;
 
 import java.util.Map;
 
@@ -10,4 +11,5 @@ public interface IUserService {
     User getUserByUsername(String username);
     boolean updateTimeSheet(Map<String, Object> params);
     boolean addTimesheet(Map<String, Object> params);
+    Week getWeek(Map<String, Object> params);
 }
