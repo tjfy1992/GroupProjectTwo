@@ -1,11 +1,10 @@
 import React, { Component } from 'react'
 import './profile.css';
-import { UserOutlined } from '@ant-design/icons';
+import { Form, Input, Button, Typography, Avatar, Upload } from 'antd';
+import { UserOutlined, UploadOutlined } from '@ant-design/icons';
 import axios from 'axios'
 
-import { Form, Input, Button, Typography, Avatar } from 'antd';
-
-  const { Title } = Typography;
+const { Title } = Typography;
 
 export default class Profile extends Component {
 
@@ -19,8 +18,8 @@ export default class Profile extends Component {
             emergencyContact1Phone: '',
             emergencyContact2Name: '',
             emergencyContact2Phone: '',
-            userProfile1: [],
             userProfiles: this.props.userProfile,
+            fileList: []
         };
     }
 
@@ -32,10 +31,10 @@ export default class Profile extends Component {
     //       })
     //   }
 
-    // testData = (e) => {
-    //     console.log(this.state.userProfiles);
-    //     console.log(this.state.userProfiles.user);
-    // };
+     testData = (e) => {
+         //console.log(localStorage);
+         console.log(this.state.userProfiles);
+     };
 
     saveUpdate = (e) => {
         e.preventDefault();
@@ -53,14 +52,16 @@ export default class Profile extends Component {
             }
             })
             .then((response) => {
-                localStorage.setItem('phone', response.data.user.phone);
-                localStorage.setItem('email', response.data.user.email);
-                localStorage.setItem('address', response.data.user.address);
-                localStorage.setItem('emergencyContact1Name', response.data.user.emergencyContact1Name);
-                localStorage.setItem('emergencyContact1Phone', response.data.user.emergencyContact1Phone);
-                localStorage.setItem('emergencyContact2Name', response.data.user.emergencyContact2Name);
-                localStorage.setItem('emergencyContact2Phone', response.data.user.emergencyContact2Phone);
-                console.log(response);
+                console.log(response)
+                alert("Your profile has been updated");
+                //window.location.reload(false);
+                //localStorage.setItem('phone', response.data.user.phone);
+                // localStorage.setItem('email', response.data.user.email);
+                // localStorage.setItem('address', response.data.user.address);
+                // localStorage.setItem('emergencyContact1Name', response.data.user.emergencyContact1Name);
+                // localStorage.setItem('emergencyContact1Phone', response.data.user.emergencyContact1Phone);
+                // localStorage.setItem('emergencyContact2Name', response.data.user.emergencyContact2Name);
+                // localStorage.setItem('emergencyContact2Phone', response.data.user.emergencyContact2Phone);
             })
             .catch((error) => {
                 console.log(error)
@@ -95,11 +96,59 @@ export default class Profile extends Component {
         this.setState({emergencyContact2Phone: e.target.value});
     }
 
+    beforeUpload = (file) => {
+        console.log(file)
+        let files = [file];
+        this.setState({
+            fileList: [...files]
+        })
+        return false;
+   };
+
+    handleChange = (info) => {
+        if (info.file.status === 'uploading') {
+
+          return;
+        }
+        if (info.file.status === 'done') {
+          
+        }
+    };
+
+    submit = () => {
+        console.log(this.state)
+        const formData = new FormData();
+        //for single file upload
+        formData.append('file', this.state.fileList[0]);
+        //add another parameter other than the file
+        formData.set("a", 1);
+        axios({
+            method: 'post',
+            url: 'http://localhost:9000/core/test/fileUploadWithForm',
+            data: formData,
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            },
+          })
+            .then((response) => {
+                console.log(response)
+            })
+            .catch((error) => {
+                console.log(error)
+        })
+    }
+
     render() {
 
         return (
             <div style={{textAlign: "left"}}>
                 <Avatar size={64} icon={<UserOutlined />} />
+                <Upload 
+                    onChange={this.handleChange}
+                    beforeUpload={this.beforeUpload}>
+                    <Button icon={<UploadOutlined />}>Click to Upload</Button>
+                </Upload>
+                <Button onClick={this.submit}>Submit</Button>
                 <Form labelCol={{ span: 9 }} wrapperCol={{ span: 5, offset: 9 }} layout="horizontal">
                     
                     <Form.Item>
@@ -141,7 +190,7 @@ export default class Profile extends Component {
                     </Form.Item>
 
                 </Form>
-                
+
             </div>
         )
     }
