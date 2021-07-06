@@ -24,12 +24,14 @@ export default class Homepage extends Component {
             username: '',
             activeTab: "1",
             option:"view",
-            weekEnding: ''
+            weekEnding: '',
+            user:[],
         };
     }
 
     componentDidMount(){
         this.testGet();
+        this.getUserInfo();
         this.setState({username: localStorage.getItem('username')});
     }
 
@@ -40,6 +42,22 @@ export default class Homepage extends Component {
           })
             .then((response) => {
                 console.log(response)
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
+    getUserInfo()  {
+        axios({
+            method: 'get',
+            url: 'http://localhost:9000/core/test/getuserinfo?username='+localStorage.getItem('username'),
+          })
+            .then((response) => {
+                this.setState(
+                    {user:response.data}
+                )
+                console.log(this.state.user.user.timeSheets);
             })
             .catch((error) => {
                 console.log(error)
@@ -76,7 +94,7 @@ export default class Homepage extends Component {
     Demo = () => (
         <Tabs activeKey={this.state.activeTab} onChange={this.changeTab} type="card">
           <TabPane tab="Summary" key="1">
-            <Summary goto={this.changeTab} delivery={this.messageDelivery} />
+            <Summary goto={this.changeTab} delivery={this.messageDelivery} userInfo={this.state.user}/>
           </TabPane>
 
           <TabPane tab="Timesheet" key="2">
@@ -84,7 +102,7 @@ export default class Homepage extends Component {
           </TabPane>
 
           <TabPane tab="Profile" key="3">
-            <Profile/>
+            <Profile userProfile={this.state.user} />
           </TabPane>
         </Tabs>
     );
@@ -99,7 +117,6 @@ export default class Homepage extends Component {
     }
 
     changeTab = (activeKey) => {
-
         console.log(activeKey);
         this.setState({activeTab: activeKey});
         this.setState({option: activeKey});

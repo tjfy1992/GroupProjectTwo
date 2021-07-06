@@ -9,4 +9,6 @@ import java.util.List;
 public interface IUserRepo extends MongoRepository<User, String> {
     @Query(value="{ 'username' : ?0, 'password': ?1 }", fields="{ 'username' : 1}")
     List<User> userLogin(String username, String password);
+
+
 }
