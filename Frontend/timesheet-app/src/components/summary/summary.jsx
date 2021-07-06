@@ -135,11 +135,16 @@ const columns = [
       var hcomment = record.holiday+' holidays included\r';
       var freminder = 'Total floating days left ' + fdayleft +' days\r';
       var vreminder = 'Total vacation days left ' + vdayleft +' days\r';
+
       finalreminder += record.usedfloatingday == 0? '':freminder+'. ';
       finalreminder += record.usedvacationday == 0? '':vreminder+'. ';
       finalcomment += record.usedfloatingday == 0? '':fcomment+'. ';
       finalcomment += record.usedvacationday == 0? '':vcomment+'. ';
       finalcomment += record.holiday === 0? '':hcomment+'. ';
+      if(fdayleft < 0 || vdayleft <0){
+        finalcomment = 'You have insufficient Floatring/Vacation Days in this year.\r';
+        finalreminder = 'Please check the comment for details. \r'
+      }
       if (finalcomment !== '') {
         comment = finalcomment;
         reminder = finalreminder;
@@ -211,14 +216,14 @@ export default class Summary extends Component {
   renderRawData =() =>{
     var arys = [];
     this.state.tempsummarys
-      .slice(0, this.state.count)
       .forEach((sheet,index) => {
         var ary = {Year: '',weekEnding : "", totalHours : 0, submissionStatus : '', approvalStatus : '', option : '', usedfloatingday: 0, holiday :0, usedvacationday : 0};
         ary.usedfloatingday = 3-sheet.remainingFloatingDays;
         ary.holiday = 0;
         ary.usedvacationday = 3-sheet.remainingVacationDays;
-        
-        sheet.weeks.forEach((week,index) => {
+        sheet.weeks
+        .slice(0, this.state.count)
+        .forEach((week,index) => {
         ary = {Year: '',weekEnding : "", totalHours : 0, submissionStatus : '', approvalStatus : '', option : '', usedfloatingday: ary.usedfloatingday, holiday :ary.holiday, usedvacationday : ary.usedvacationday}          
         ary.Year = sheet.year;
         console.log(ary.usedfloatingday,ary.usedvacationday,ary.holiday);
@@ -237,21 +242,21 @@ export default class Summary extends Component {
         }
         if (ary.submissionStatus === "Completed") {
           ary.option = (
-            <a onClick={this.handleOption(sheet,'view')}>
+            <a onClick={this.handleOption(week,'view')}>
             {" "}
             View
           </a>
           );
         } else if (ary.submissionStatus === "Incomplete") {
           ary.option = (
-            <a onClick={this.handleOption(sheet,'edit')}>
+            <a onClick={this.handleOption(week,'edit')}>
               {" "}
               Edit
             </a>
           );
         } else {
           ary.option = (
-            <a onClick={this.handleOption(sheet,'edit')}>
+            <a onClick={this.handleOption(week,'edit')}>
               {" "}
               Start
             </a>
@@ -353,12 +358,14 @@ export default class Summary extends Component {
 
 
   handleOption = (summary,option) => (event) => {
-    console.log(summary.weekEnding);
+
     if(option === 'view'){
       this.props.delivery('view',summary.weekEnding)
+      console.log('view',summary.weekEnding)
       this.props.goto('2');
     } else {
       this.props.delivery('edit',summary.weekEnding)
+      console.log('edit',summary.weekEnding)
       this.props.goto('2');
     }
 
