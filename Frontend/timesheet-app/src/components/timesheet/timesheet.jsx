@@ -78,7 +78,14 @@ const workHourData = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
 
 export default class Timesheet extends Component {
 
-    approveSelect = <Select style={{ width: 200 }} defaultValue='Approved timesheet' onChange={(e) => this.approveSelectChange('1111', e)}>{approveOptionList.map((item, index) => <Option value={item} >{item}</Option>)}</Select>
+    approveSelect = () => {
+        return (<Select style={{ width: 200 }} 
+                defaultValue='Approved timesheet'
+                disabled={this.state.currentOperation === 'View'}
+                onChange={(e) => this.approveSelectChange('1111', e)}>
+            {approveOptionList.map((item, index) => <Option value={item} >{item}</Option>)}
+        </Select>)
+    }
 
     approveSelectChange(id, e) {
         console.log(id)
@@ -157,7 +164,10 @@ export default class Timesheet extends Component {
     dataPickerChange(value) {
         if (value != null) {
             console.log(value.toDate())
-            this.setState({ endDate: value.toDate()}, () => this.updateArrayBySelectingDate())
+            this.setState(
+                { endDate: value.toDate()
+            }, 
+            () => this.updateArrayBySelectingDate(moment(value.toDate()).format('MM/DD/YYYY')))
         }
     }
 
@@ -176,9 +186,10 @@ export default class Timesheet extends Component {
     }
 
 
-    updateArrayBySelectingDate = () => {
+    updateArrayBySelectingDate = (value) => {
         this.setState({ rows: [] }, () => {
-            this.updateDateArray();
+            //this.updateDateArray();
+            this.getTimesheetData('zack', value);
         });
     }
 
@@ -284,7 +295,6 @@ export default class Timesheet extends Component {
     }
 
     componentDidMount() {
-        //this.updateDateArray();
         this.getTimesheetData();
     }
 
@@ -292,6 +302,7 @@ export default class Timesheet extends Component {
         super(props);
         this.state = {
             isUpdating: false,
+            currentOperation: 'Add',
             endDate: getEndDate(),
             rows: [],
             fileList: [],
@@ -356,19 +367,19 @@ export default class Timesheet extends Component {
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 Tolal Compensated Hours:<InputNumber min={0} max={168} disabled={true} value={this.state.totalComposite} defaultValue={40} />
                 <br/>
-                <Button style={{float: 'right'}} onClick={this.setDefault}>Set Default</Button>
+                <Button style={{float: 'right'}} onClick={this.setDefault} disabled={this.state.currentOperation === 'View'}>Set Default</Button>
                 <br/>
                 <br/>
                 <Table dataSource={this.state.rows} columns={columns} pagination={false}  />
-                {this.approveSelect}
+                {this.approveSelect()}
                 &nbsp;
                 <Upload 
                     onChange={this.handleChange}
                     beforeUpload={this.beforeUpload}>
-                    <Button icon={<UploadOutlined />}>Click to Upload</Button>
+                    <Button icon={<UploadOutlined />} disabled={this.state.currentOperation === 'View'}>Click to Upload</Button>
                 </Upload>
                 <br/>
-                <Button onClick={this.submitData}>Save</Button>
+                <Button onClick={this.submitData} disabled={this.state.currentOperation === 'View'}>Save</Button>
             </div>
         )
     }
@@ -434,7 +445,7 @@ export default class Timesheet extends Component {
     }
 
     setDefault = () => {
-        this.updateArrayBySelectingDate()
+        this.updateArrayBySelectingDate(moment(this.state.endDate).format('MM/DD/YYYY'))
     }
 
     getTimesheetData = (username = 'zack', endDate = '07/10/2021') => {
@@ -444,7 +455,18 @@ export default class Timesheet extends Component {
           })
             .then((response) => {
                 console.log(response)
-                this.updateDataForEdit(response.data)
+                //updateDateArray
+                if(!response.data.week){
+                    this.setState({currentOperation: "Add"}, () => this.updateDateArray());
+                }
+                else if(response.data.week.status === "Approved"){
+                    this.setState({currentOperation: "View"}, 
+                        () => this.updateDataForView(response.data));
+                }
+                else{
+                    this.setState({currentOperation: "Update"}, 
+                        () => this.updateDataForEdit(response.data));
+                }
             })
             .catch((error) => {
                 console.log(error)
@@ -463,9 +485,9 @@ export default class Timesheet extends Component {
             date: saturdayDate,
             dayStr: 'Saturday',
             key: 1,
-            startTime: moment(new Date(week.saturday.startingTime.value)).format('hh:mm'),
-            endingTime: moment(new Date(week.saturday.endingTime.value)).format('hh:mm'),
-            workHourMeta: (week.saturday.endingTime.value - week.saturday.startingTime.value) / (1000 * 60 * 60 ),
+            startTime: week.saturday.startingTime > 0? week.saturday.startingTime + ":00": "NA",
+            endingTime: week.saturday.endingTime > 0? week.saturday.endingTime + ":00": "NA",
+            workHourMeta: week.saturday.endingTime - week.saturday.startingTime,
             isFloating: week.saturday.floatingDay,
             isHoliday: week.saturday.holiday,
             isVacation: week.saturday.vacation,
@@ -479,9 +501,9 @@ export default class Timesheet extends Component {
             date: fridayDate,
             dayStr: 'Friday',
             key: 2,
-            startTime: moment(new Date(week.friday.startingTime.value)).format('hh:mm'),
-            endingTime: moment(new Date(week.friday.endingTime.value)).format('hh:mm'),
-            workHourMeta: (week.friday.endingTime.value - week.friday.startingTime.value) / (1000 * 60 * 60 ),
+            startTime: week.friday.startingTime > 0? week.friday.startingTime + ":00": "NA",
+            endingTime: week.friday.endingTime > 0? week.friday.endingTime + ":00": "NA",
+            workHourMeta: week.friday.endingTime - week.friday.startingTime,
             isFloating: week.friday.floatingDay,
             isHoliday: week.friday.holiday,
             isVacation: week.friday.vacation,
@@ -495,9 +517,9 @@ export default class Timesheet extends Component {
             date: thursdayDate,
             dayStr: 'Thursday',
             key: 3,
-            startTime: moment(new Date(week.thursday.startingTime.value)).format('hh:mm'),
-            endingTime: moment(new Date(week.thursday.endingTime.value)).format('hh:mm'),
-            workHourMeta: (week.thursday.endingTime.value - week.thursday.startingTime.value) / (1000 * 60 * 60 ),
+            startTime: week.thursday.startingTime > 0? week.thursday.startingTime + ":00": "NA",
+            endingTime: week.thursday.endingTime > 0? week.thursday.endingTime + ":00": "NA",
+            workHourMeta: week.thursday.endingTime - week.thursday.startingTime,
             isFloating: week.thursday.floatingDay,
             isHoliday: week.thursday.holiday,
             isVacation: week.thursday.vacation,
@@ -511,9 +533,9 @@ export default class Timesheet extends Component {
             date: wednesdayDate,
             dayStr: 'Wednesday',
             key: 4,
-            startTime: moment(new Date(week.wednesday.startingTime.value)).format('hh:mm'),
-            endingTime: moment(new Date(week.wednesday.endingTime.value)).format('hh:mm'),
-            workHourMeta: (week.wednesday.endingTime.value - week.wednesday.startingTime.value) / (1000 * 60 * 60 ),
+            startTime: week.wednesday.startingTime > 0? week.wednesday.startingTime + ":00": "NA",
+            endingTime: week.wednesday.endingTime > 0? week.wednesday.endingTime + ":00": "NA",
+            workHourMeta: week.wednesday.endingTime - week.wednesday.startingTime,
             isFloating: week.wednesday.floatingDay,
             isHoliday: week.wednesday.holiday,
             isVacation: week.wednesday.vacation,
@@ -528,9 +550,9 @@ export default class Timesheet extends Component {
             date: tuesdayDate,
             dayStr: 'Tuesday',
             key: 5,
-            startTime: moment(new Date(week.tuesday.startingTime.value)).format('hh:mm'),
-            endingTime: moment(new Date(week.tuesday.endingTime.value)).format('hh:mm'),
-            workHourMeta: (week.tuesday.endingTime.value - week.tuesday.startingTime.value) / (1000 * 60 * 60 ),
+            startTime: week.tuesday.startingTime > 0? week.tuesday.startingTime + ":00": "NA",
+            endingTime: week.tuesday.endingTime > 0? week.tuesday.endingTime + ":00": "NA",
+            workHourMeta: week.tuesday.endingTime - week.tuesday.startingTime,
             isFloating: week.tuesday.floatingDay,
             isHoliday: week.tuesday.holiday,
             isVacation: week.tuesday.vacation,
@@ -544,9 +566,9 @@ export default class Timesheet extends Component {
             date: mondayDate,
             dayStr: 'Monday',
             key: 6,
-            startTime: moment(new Date(week.monday.startingTime.value)).format('hh:mm'),
-            endingTime: moment(new Date(week.monday.endingTime.value)).format('hh:mm'),
-            workHourMeta: (week.monday.endingTime.value - week.monday.startingTime.value) / (1000 * 60 * 60 ),
+            startTime: week.monday.startingTime > 0? week.monday.startingTime + ":00": "NA",
+            endingTime: week.monday.endingTime > 0? week.monday.endingTime + ":00": "NA",
+            workHourMeta: week.monday.endingTime - week.monday.startingTime,
             isFloating: week.monday.floatingDay,
             isHoliday: week.monday.holiday,
             isVacation: week.monday.vacation,
@@ -560,9 +582,9 @@ export default class Timesheet extends Component {
             date: sundayDate,
             dayStr: 'Sunday',
             key: 7,
-            startTime: moment(new Date(week.sunday.startingTime.value)).format('hh:mm'),
-            endingTime: moment(new Date(week.sunday.endingTime.value)).format('hh:mm'),
-            workHourMeta: (week.sunday.endingTime.value - week.sunday.startingTime.value) / (1000 * 60 * 60 ),
+            startTime: week.sunday.startingTime > 0? week.sunday.startingTime + ":00": "NA",
+            endingTime: week.sunday.endingTime > 0? week.sunday.endingTime + ":00": "NA",
+            workHourMeta: week.sunday.endingTime - week.sunday.startingTime,
             isFloating: week.sunday.floatingDay,
             isHoliday: week.sunday.holiday,
             isVacation: week.sunday.vacation,
@@ -588,23 +610,6 @@ export default class Timesheet extends Component {
     updateDataForEdit = (data) => {
         let week = data.week;
         let dataArr = [];
-
-
-        // arr.push({
-        //     key: i,
-        //     day: day,
-        //     dayStr: moment(today).format('dddd'),
-        //     date: moment(today).format('MM/DD/YYYY'),
-        //     startTime: startSelector,
-        //     endingTime: endSelector,
-        //     totalHours: null,
-        //     holidayMeta: 0,
-        //     startTimeMeta: startMeta,
-        //     endTimeMeta: endMeta,
-        //     workHourMeta: workHourMeta,
-        //     holidayGroup: null
-        // })
-
 
         //saturday
         const dateObj = new Date(week.weekEnding);
@@ -747,15 +752,6 @@ export default class Timesheet extends Component {
                     buttonStyle="solid"
                 />
                 this.state.rows[i].totalHours = <InputNumber min={0} max={24 * 7} disabled={true} value={this.state.rows[i].workHourMeta} />
-
-                // let item = this.state.rows[i];
-                // let holidayValue = item.isFloating ? 1 : (item.isHoliday? 2 : (item.isVacation? 3: 0))
-                // this.state.rows[i].holidayGroup = <Radio.Group
-                //     options={holidayOption}
-                //     value={holidayValue}
-                //     buttonStyle="solid"
-                // />
-                // this.state.rows[i].totalHours = <InputNumber min={0} max={24 * 7} disabled={true} value={this.state.rows[i].workHourMeta} />
             }
         });
 

@@ -98,6 +98,7 @@ public class UserServiceImpl implements IUserService {
                 .findFirst().orElse(null);
         if(existedWeek == null)
             return false;
+        week.setStatus("Pending");
         user.getTimeSheets().get(position.get()).getWeeks().set(position2.get(), week);
         iUserRepo.save(user);
 
@@ -134,6 +135,7 @@ public class UserServiceImpl implements IUserService {
         if(vacationDaysThisWeek > timeSheet.getRemainingVacationDays()){
             return false;
         }
+        week.setStatus("Pending");
         //add to timesheet
         timeSheet.getWeeks().add(week);
 

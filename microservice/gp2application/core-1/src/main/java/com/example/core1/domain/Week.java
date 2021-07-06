@@ -20,4 +20,5 @@ public class Week {
     private Day Thursday;
     private Day Friday;
     private Day Saturday;
+    private String status;
 }
