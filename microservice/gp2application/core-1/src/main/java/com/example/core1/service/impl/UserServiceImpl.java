@@ -1,7 +1,9 @@
 package com.example.core1.service.impl;
 
 import com.example.core1.dao.IUserRepo;
+import com.example.core1.domain.TimeSheet;
 import com.example.core1.domain.User;
+import com.example.core1.domain.Week;
 import com.example.core1.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,22 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public boolean updateTimeSheet(Map<String, Object> params) {
+        return false;
+    }
+
+    @Override
+    public boolean addTimesheet(Map<String, Object> params) {
+//        List<TimeSheet> timeSheetList = user.getTimeSheets();
+//        TimeSheet timeSheet = timeSheetList.stream()
+//                .filter(item -> item.getYear().equals(year)).findFirst().orElse(null);
+//        List<Week> weeks = timeSheet.getWeeks();
+//        long milliseconds = dateFormat.parse("2021-07-03").getTime();
+//        Week week = weeks.stream()
+//                .filter(item -> item.getWeekEnding().getTime() == milliseconds)
+//                .findFirst().orElse(null);
+
+        System.out.println(params);
+        System.out.println(params.get("Saturday"));
         return false;
     }
 }

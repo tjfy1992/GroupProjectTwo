@@ -8,4 +8,5 @@ public interface IUserService {
     Map<String, Object> getAllUsers();
     User getUserByUsername(String username);
     boolean updateTimeSheet(Map<String, Object> params);
+    boolean addTimesheet(Map<String, Object> params);
 }

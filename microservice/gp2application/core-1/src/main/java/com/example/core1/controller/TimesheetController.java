@@ -55,4 +55,11 @@ public class TimesheetController {
 
         return resultMap;
     }
+
+    @PostMapping("/addTimesheet")
+    public Map<String, Object> addTimesheet(@RequestParam Map<String, Object> params) throws ParseException {
+        Map<String, Object> resultMap = new HashMap<>();
+        iUserService.addTimesheet(params);
+        return resultMap;
+    }
 }
