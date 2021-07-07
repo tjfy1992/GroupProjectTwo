@@ -11,6 +11,7 @@ const columns = [
     dataIndex: 'weekEnding',
     key: 'weekEnding',
     sorter: (a, b) => new Date(a.weekEnding) - new Date(b.weekEnding),
+    sortDirections: ['descend'],
   },
   {
     title: 'Total Hours',
