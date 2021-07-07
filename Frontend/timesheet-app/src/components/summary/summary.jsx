@@ -271,26 +271,40 @@ export default class Summary extends Component {
             var date = new Date(week.weekEnding);
             ary.weekEnding=((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + ((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())) + '/' + date.getFullYear();
           } 
-          if (week.sunday.startingTime != -1){
+          if (week.sunday.startingTime != -1 && week.sunday.floatingDay != true && week.sunday.vacation != true){
             ary.totalHours += week.sunday.endingTime-week.sunday.startingTime;
+          } else if(week.sunday.startingTime != -1 && week.sunday.floatingDay == true || week.sunday.vacation == true) {
+            ary.totalHours += 8;
           }
-          if (week.monday.startingTime != -1){
+          if (week.monday.startingTime != -1 && week.monday.floatingDay != true && week.monday.vacation != true){
             ary.totalHours += week.monday.endingTime-week.monday.startingTime;
+          } else if(week.monday.startingTime != -1 && week.monday.floatingDay == true || week.monday.vacation == true) {
+            ary.totalHours += 8;
           }
-          if (week.tuesday.startingTime != -1){
+          if (week.tuesday.startingTime != -1 && week.tuesday.floatingDay != true && week.tuesday.vacation != true){
             ary.totalHours += week.tuesday.endingTime-week.tuesday.startingTime;
+          } else if(week.tuesday.startingTime != -1 && week.tuesday.floatingDay == true || week.tuesday.vacation == true) {
+            ary.totalHours += 8;
           }
-          if (week.wednesday.startingTime!= -1){
+          if (week.wednesday.startingTime!= -1 && week.wednesday.floatingDay != true && week.wednesday.vacation != true){
             ary.totalHours += week.wednesday.endingTime-week.wednesday.startingTime;
+          }else if(week.wednesday.startingTime != -1 && week.wednesday.floatingDay == true || week.wednesday.vacation == true) {
+            ary.totalHours += 8;
           }
-          if (week.thursday.startingTime != -1){
+          if (week.thursday.startingTime != -1 && week.thursday.floatingDay != true && week.thursday.vacation != true){
             ary.totalHours += week.thursday.endingTime-week.thursday.startingTime;
+          } else if(week.thursday.startingTime != -1 && week.thursday.floatingDay == true || week.thursday.vacation == true) {
+            ary.totalHours += 8;
           }
-          if (week.friday.startingTime!= -1){
+          if (week.friday.startingTime!= -1 && week.friday.floatingDay != true && week.friday.vacation != true){
             ary.totalHours += week.friday.endingTime-week.friday.startingTime;
+          } else if(week.friday.startingTime != -1 && week.friday.floatingDay == true || week.friday.vacation == true) {
+            ary.totalHours += 8;
           }
-          if (week.saturday.startingTime!= -1){
+          if (week.saturday.startingTime!= -1 && week.saturday.floatingDay != true && week.saturday.vacation != true){
             ary.totalHours += week.saturday.endingTime-week.saturday.startingTime;
+          } else if(week.saturday.startingTime != -1 && week.saturday.floatingDay == true || week.saturday.vacation == true) {
+            ary.totalHours += 8;
           }
           if (week.sunday.holiday == false){
             if(week.sunday.floatingDay == true){
