@@ -80,7 +80,7 @@ export default class Homepage extends Component {
                 </Header>
                 <Content className="site-layout" style={{ padding: '0 50px', marginTop: 74 }}>
                     <div className="site-card-border-less-wrapper">
-                        <Card bordered={false} style={{ width: "80%", height: 800, margin: "0 auto" }}>
+                        <Card bordered={false} style={{ width: "80%", minHeight:"650px" ,height: "100%", margin: "0 auto" }}>
                             <this.Demo/>
                         </Card>
                     </div>  

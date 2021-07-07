@@ -102,6 +102,7 @@ public class UserServiceImpl implements IUserService {
             return false;
         week.setStatus("Pending");
         user.getTimeSheets().get(position.get()).getWeeks().set(position2.get(), week);
+        System.out.println(user);
         iUserRepo.save(user);
 
         return true;
@@ -142,6 +143,7 @@ public class UserServiceImpl implements IUserService {
         timeSheet.getWeeks().add(week);
 
         user.getTimeSheets().set(position.get(), timeSheet);
+        System.out.println(user);
         iUserRepo.save(user);
 
         return true;
@@ -149,18 +151,16 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public boolean updateProfile(Map<String, String> params) {
-        System.out.println("Arrive Service");
-        System.out.println(params);
+        //System.out.println(params);
 
+        //find user by username
         List<User> users = iUserRepo.userInfo(params.get("username"));
         if(users.isEmpty())
             return false;
         User user = users.get(0);
         System.out.println(user);
-        user.setPhone(params.get("phone"));
-        user.setEmail(params.get("email"));
-        user.setAddress(params.get("address"));
 
+        //create emergencyContacts based on params
         List<EmergencyContact> contactList = new ArrayList<>();;
         EmergencyContact ec1 = new EmergencyContact();
         EmergencyContact ec2 = new EmergencyContact();
@@ -190,31 +190,16 @@ public class UserServiceImpl implements IUserService {
         contactList.add(ec1);
         contactList.add(ec2);
 
+        //set user
+        user.setPhone(params.get("phone"));
+        user.setEmail(params.get("email"));
+        user.setAddress(params.get("address"));
         user.setEmergencyContacts(contactList);
 
         System.out.println(user);
-        ;iUserRepo.save(user);
-        /*String phone = params.get("phone");
-        String email = params.get("email");
-        String address = params.get("address");
+        //CRUD save
+        iUserRepo.save(user);
 
-        String emergencyContact1Name = params.get("emergencyContact1Name");
-        String[] Name1Split = emergencyContact1Name.split("\\s+");
-        String contact1FirstName = "", contact1LastName = "";
-        if (Name1Split.length >= 2) {
-            contact1FirstName = Name1Split[0];
-            contact1LastName = Name1Split[1];
-        }
-        String emergencyContact1Phone = params.get("emergencyContact1Phone");
-
-        String emergencyContact2Name = params.get("emergencyContact2Name");
-        String[] Name2Split = emergencyContact2Name.split("\\s+");
-        String contact2FirstName = "", contact2LastName = "";
-        if (Name2Split.length >= 2) {
-            contact2FirstName = Name2Split[0];
-            contact2LastName = Name2Split[1];
-        }
-        String emergencyContact2Phone = params.get("emergencyContact2Phone");*/
         return true;
     }
 
