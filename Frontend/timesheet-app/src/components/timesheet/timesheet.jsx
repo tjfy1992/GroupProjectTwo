@@ -486,11 +486,52 @@ export default class Timesheet extends Component {
     }
 
     setDefault = () => {
-        // if(this.state.currentOperation === "Add"){
-        //     this.updateDateArray();
-        //     return;
-        // }
-        this.updateArrayBySelectingDate(moment(this.state.endDate).format('MM/DD/YYYY'))
+        
+        if(this.state.currentOperation === "Update"){
+            var {userName} = this.props;
+            let template = {username: userName,
+                            Sunday:'',
+                            Monday:'',
+                            Tuesday:'',
+                            Wednesday:'',
+                            Thursday:'',
+                            Friday:'',
+                            Saturday:'',
+                            };
+            this.state.rows.forEach((item,index) => {
+                let newDay = {
+                    'startingHour': item.startTimeMeta,
+                    'endingHour': item.endTimeMeta,
+                    'isFloatingDay': item.holidayMeta === 0? false: (item.holidayMeta  === 1? true: false),
+                    'isHoliday': item.holidayMeta === 0? false: (item.holidayMeta === 2? true: false),
+                    'isVacation': item.holidayMeta === 0? false: (item.holidayMeta === 3? true: false)
+                };
+                
+                if(index == 0){
+                    template.Sunday = newDay;
+                } else if(index == 1){
+                    template.Monday = newDay;
+                } else if(index == 2){
+                    template.Tuesday = newDay;
+                } else if(index == 3){
+                    template.Wednesday = newDay;
+                } else if(index == 4){
+                    template.Thursday = newDay;
+                } else if(index == 5){
+                    template.Friday = newDay;
+                } else if(index == 6){
+                    template.Saturday = newDay;
+                }
+                index +=1;
+            })
+            console.log(template);
+            axios({
+                method: 'post',
+                url: 'http://localhost:9000/core/test/updateTemplate',
+                data: template,
+            })
+            
+        }
     }
 
     getTimesheetData = (username = 'zack', endDate = '07/10/2021') => {

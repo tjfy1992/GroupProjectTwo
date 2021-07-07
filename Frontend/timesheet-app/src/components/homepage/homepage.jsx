@@ -35,9 +35,7 @@ export default class Homepage extends Component {
         this.getUserInfo();
         var token = localStorage.getItem('token');
         var decodedusername = jwt(token).sub.split(',')[1].substring(jwt(token).sub.split(',')[1].lastIndexOf("=") + 1, jwt(token).sub.split(',')[1].lastIndexOf("}"));
-        this.setState({username: decodedusername});
-
-        console.log(decodedusername);
+        this.setState({username: decodedusername},()=>console.log(decodedusername));
     }
 
     testGet = () => {
@@ -102,7 +100,7 @@ export default class Homepage extends Component {
           </TabPane>
 
           <TabPane tab="Timesheet" key="2">
-            <Timesheet option={this.state.option} EndDate={this.state.weekEnding}/>
+            <Timesheet option={this.state.option} EndDate={this.state.weekEnding}S userName={this.state.username}/>
           </TabPane>
 
           <TabPane tab="Profile" key="3">

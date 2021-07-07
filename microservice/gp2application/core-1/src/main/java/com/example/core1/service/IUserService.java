@@ -13,4 +13,7 @@ public interface IUserService {
     boolean addTimesheet(Map<String, Object> params);
     boolean updateProfile(Map<String, String> params);
     Week getWeek(Map<String, Object> params);
+    Week buildTemplate(Map<String, Object> params);
+    public boolean updateTemplate(Map<String, Object> params);
+    public Week getTemplateByUsername(String username);
 }

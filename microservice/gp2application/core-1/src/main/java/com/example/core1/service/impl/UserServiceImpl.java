@@ -63,10 +63,30 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    public Week getTemplateByUsername(String username) {
+        List<User> users = iUserRepo.userInfo(params.get("username").toString());
+        if(week.isEmpty())
+            return null;
+        return week.get(0);
+    }
+
+    @Override
+    public boolean updateTemplate(Map<String, Object> params) {
+        Week week = this.buildTemplate(params);
+        List<User> users = iUserRepo.userInfo(params.get("username").toString());
+        if (users.isEmpty())
+            return false;
+        User user = users.get(0);
+        user.setTemplate(week);
+        iUserRepo.save(user);
+        return true;
+    }
+    @Override
     public boolean updateTimeSheet(Map<String, Object> params) {
         Week week = this.buildWeek(params);
 
         List<User> users = iUserRepo.userInfo(params.get("username").toString());
+
         if(users.isEmpty())
             return false;
         User user = users.get(0);
@@ -242,6 +262,99 @@ public class UserServiceImpl implements IUserService {
         Week week = timeSheet.getWeeks().stream()
                 .filter(item -> item.getWeekEnding().getTime() == parsedDateTime.getMillis())
                 .findFirst().orElse(null);
+        return week;
+    }
+
+    @Override
+    public Week buildTemplate(Map<String, Object> params){
+        //create a week
+        Week week = new Week();
+        System.out.println(params.toString());
+        //Sunday
+        Map<String, Object> Sunday = gson.fromJson(params.get("Sunday").toString(), Map.class);
+        Double startingHour = (Double) Sunday.get("startingHour");
+        Double endingHour = (Double) Sunday.get("endingHour");
+        Boolean isFloating = (Boolean) Sunday.get("isFloatingDay");
+        Boolean isHoliday = (Boolean) Sunday.get("isHoliday");
+        Boolean isVacation = (Boolean) Sunday.get("isVacation");
+        Day sunday = new Day(startingHour.intValue(), endingHour.intValue(),
+                isFloating, isHoliday, isVacation);
+        week.setSunday(sunday);
+
+        //Monday
+        Map<String, Object> Monday = gson.fromJson(params.get("Monday").toString(), Map.class);
+        startingHour = (Double) Monday.get("startingHour");
+        endingHour = (Double) Monday.get("endingHour");
+        isFloating = (Boolean) Monday.get("isFloatingDay");
+        isHoliday = (Boolean) Monday.get("isHoliday");
+        isVacation = (Boolean) Monday.get("isVacation");
+        Day monday = new Day(startingHour.intValue(), endingHour.intValue(),
+                isFloating, isHoliday, isVacation);
+        week.setMonday(monday);
+
+        //Tuesday
+        Map<String, Object> Tuesday = gson.fromJson(params.get("Tuesday").toString(), Map.class);
+        startingHour = (Double) Tuesday.get("startingHour");
+        endingHour = (Double) Tuesday.get("endingHour");
+        isFloating = (Boolean) Tuesday.get("isFloatingDay");
+        isHoliday = (Boolean) Tuesday.get("isHoliday");
+        isVacation = (Boolean) Tuesday.get("isVacation");
+        Day tuesday = new Day(startingHour.intValue(), endingHour.intValue(),
+                isFloating, isHoliday, isVacation);
+        week.setTuesday(tuesday);
+
+        //Wednesday
+        Map<String, Object> Wednesday = gson.fromJson(params.get("Wednesday").toString(), Map.class);
+        startingHour = (Double) Wednesday.get("startingHour");
+        endingHour = (Double) Wednesday.get("endingHour");
+        isFloating = (Boolean) Wednesday.get("isFloatingDay");
+        isHoliday = (Boolean) Wednesday.get("isHoliday");
+        isVacation = (Boolean) Wednesday.get("isVacation");
+        Day wednesday = new Day(startingHour.intValue(), endingHour.intValue(),
+                isFloating, isHoliday, isVacation);
+        week.setWednesday(wednesday);
+
+        //Thursday
+        Map<String, Object> Thursday = gson.fromJson(params.get("Thursday").toString(), Map.class);
+        startingHour = (Double) Thursday.get("startingHour");
+        endingHour = (Double) Thursday.get("endingHour");
+        isFloating = (Boolean) Thursday.get("isFloatingDay");
+        isHoliday = (Boolean) Thursday.get("isHoliday");
+        isVacation = (Boolean) Thursday.get("isVacation");
+        Day thursday = new Day(startingHour.intValue(), endingHour.intValue(),
+                isFloating, isHoliday, isVacation);
+        week.setThursday(thursday);
+
+        //Friday
+        Map<String, Object> Friday = gson.fromJson(params.get("Friday").toString(), Map.class);
+        startingHour = (Double) Friday.get("startingHour");
+        endingHour = (Double) Friday.get("endingHour");
+        isFloating = (Boolean) Friday.get("isFloatingDay");
+        isHoliday = (Boolean) Friday.get("isHoliday");
+        isVacation = (Boolean) Friday.get("isVacation");
+        Day friday = new Day(startingHour.intValue(), endingHour.intValue(),
+                isFloating, isHoliday, isVacation);
+        week.setFriday(friday);
+
+        //Saturday
+        Map<String, Object> Saturday = gson.fromJson(params.get("Saturday").toString(), Map.class);
+        startingHour = (Double) Saturday.get("startingHour");
+        endingHour = (Double) Saturday.get("endingHour");
+        isFloating = (Boolean) Saturday.get("isFloatingDay");
+        isHoliday = (Boolean) Saturday.get("isHoliday");
+        isVacation = (Boolean) Saturday.get("isVacation");
+        Day saturday = new Day(startingHour.intValue(), endingHour.intValue(),
+                isFloating, isHoliday, isVacation);
+        week.setSaturday(saturday);
+
+        //set weekending
+
+        String endDateStr = "2021-07-03T04:00:00.000+00:00";
+        DateTimeFormatter dateTimeFormatter
+                = DateTimeFormat.forPattern("MM/dd/yyyy");
+        DateTime parsedDateTime = DateTime.parse(endDateStr, dateTimeFormatter);
+        week.setWeekEnding(parsedDateTime.toDate());
+
         return week;
     }
 

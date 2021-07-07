@@ -209,7 +209,7 @@ export default class Summary extends Component {
       this.setState({userInfos: this.props.userInfo},()=>{ this.setState({tempsummarys: this.state.userInfos.user.timeSheets})})
     }
     
-    console.log(this.renderRawData());
+    console.log(this.props.userInfo);
 
   }
 
