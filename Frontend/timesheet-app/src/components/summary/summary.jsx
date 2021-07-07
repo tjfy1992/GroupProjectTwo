@@ -83,7 +83,7 @@ const columns = [
     ],
     
     render: (approvalStatus) => {
-      let color = approvalStatus.length === 3 ? 'gray' : 'green';
+      let color = approvalStatus.length === 7 ? 'gray' : 'green';
       if (color ==='gray') {
 
 
