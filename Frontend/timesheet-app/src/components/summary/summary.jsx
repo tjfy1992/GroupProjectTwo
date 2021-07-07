@@ -10,7 +10,7 @@ const columns = [
     title: 'WeekEnding',
     dataIndex: 'weekEnding',
     key: 'weekEnding',
-
+    sorter: (a, b) => new Date(b.weekEnding) - new Date(a.weekEnding),
   },
   {
     title: 'Total Hours',
@@ -174,7 +174,7 @@ export default class Summary extends Component {
     this.state = {
       tempsummarys:[],
       summarycolumns:[],
-      count: 3,
+      count: 2,
       show: "Show More",
       userInfos: [],
     };
@@ -183,19 +183,19 @@ export default class Summary extends Component {
 
   
     handleShowMore = () => {
-      if (this.state.tempsummarys.length - this.state.count < 3 && this.state.count !== this.state.tempsummarys.length+1 ) {
+      if (this.state.tempsummarys.length - this.state.count < 2 && this.state.count !== this.state.tempsummarys.length+1 ) {
         this.setState({
           count: this.state.tempsummarys.length+1,
           show: "Hide All",
         });
       } else if(this.state.count === this.state.tempsummarys.length+1){
         this.setState({
-          count: 3,
+          count: 2,
           show: "Show More",
         });
       } else {
         this.setState({
-          count: this.state.count+3,
+          count: this.state.count+2,
           show: "Show More",
         });
       }
