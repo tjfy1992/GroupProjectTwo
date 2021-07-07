@@ -64,10 +64,11 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public Week getTemplateByUsername(String username) {
-        List<User> users = iUserRepo.userInfo(params.get("username").toString());
-        if(week.isEmpty())
+        List<User> users = iUserRepo.userInfo(username);
+        if(users.isEmpty())
             return null;
-        return week.get(0);
+
+        return users.get(0).getTemplate();
     }
 
     @Override
