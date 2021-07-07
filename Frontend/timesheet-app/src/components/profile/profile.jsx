@@ -48,19 +48,19 @@ export default class Profile extends Component {
             this.state.email = this.state.userProfiles.user.email;
         }
         if (this.state.address === "") {
-            this.state.address = this.state.userProfiles.user.email;
+            this.state.address = this.state.userProfiles.user.address;
         }
         if (this.state.emergencyContact1Name === "") {
             this.state.emergencyContact1Name = this.state.userProfiles.user.emergencyContacts[0].firstName + ' ' + this.state.userProfiles.user.emergencyContacts[0].lastName;
         }
         if (this.state.emergencyContact1Phone === "") {
-            this.state.emergencyContact1Phone = this.state.userProfiles.user.emergencyContact1Phone;
+            this.state.emergencyContact1Phone = this.state.userProfiles.user.emergencyContacts[0].phone;
         }
         if (this.state.emergencyContact2Name === "") {
             this.state.emergencyContact2Name = this.state.userProfiles.user.emergencyContacts[1].firstName + ' ' + this.state.userProfiles.user.emergencyContacts[1].lastName;
         }
         if (this.state.emergencyContact2Phone === "") {
-            this.state.emergencyContact2Phone = this.state.userProfiles.user.emergencyContact2Phone;
+            this.state.emergencyContact2Phone = this.state.userProfiles.user.emergencyContacts[1].phone;
         }
         console.log(this.state)
         axios({
