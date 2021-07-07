@@ -10,7 +10,7 @@ const columns = [
     title: 'WeekEnding',
     dataIndex: 'weekEnding',
     key: 'weekEnding',
-    sorter: (a, b) => new Date(b.weekEnding) - new Date(a.weekEnding),
+    sorter: (a, b) => new Date(a.weekEnding) - new Date(b.weekEnding),
   },
   {
     title: 'Total Hours',
