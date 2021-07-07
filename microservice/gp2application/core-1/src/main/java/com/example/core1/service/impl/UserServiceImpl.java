@@ -63,8 +63,8 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public Week getTemplateByUsername(Map<String, Object> params) {
-        List<Week> week= iUserRepo.getUserTemplate(params.get("username"));
+    public Week getTemplateByUsername(String username) {
+        List<Week> week= iUserRepo.getUserTemplate("zack");
         if(week.isEmpty())
             return null;
         return week.get(0);
@@ -73,7 +73,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public boolean updateTemplate(Map<String, Object> params) {
         Week week = this.buildTemplate(params);
-        List<User> users = iUserRepo.userInfo(params.get("username").toString());
+        List<User> users = iUserRepo.userInfo("zack");
         if (users.isEmpty())
             return false;
         User user = users.get(0);
@@ -267,6 +267,7 @@ public class UserServiceImpl implements IUserService {
     public Week buildTemplate(Map<String, Object> params){
         //create a week
         Week week = new Week();
+        System.out.println(params.toString());
         //Sunday
         Map<String, Object> Sunday = gson.fromJson(params.get("Sunday").toString(), Map.class);
         Double startingHour = (Double) Sunday.get("startingHour");

@@ -61,7 +61,7 @@ public class TestController {
         }
         Map<String, Object> map =  new HashMap<>();
         map.put("result","true");
-        map.put("template",iUserService.getTemplateByUsername(params.get("username")));
+        map.put("template",iUserService.getTemplateByUsername("zack"));
         return ResponseEntity.ok(map);
     }
 
@@ -75,6 +75,8 @@ public class TestController {
         Map<String, Object> map =  new HashMap<>();
         map.put("result","success");
         iUserService.updateTemplate(params);
+        User user = (User) map.get("user");
+        System.out.println(user);
         return ResponseEntity.ok(map);
     }
 

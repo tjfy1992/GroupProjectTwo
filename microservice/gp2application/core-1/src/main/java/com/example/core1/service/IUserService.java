@@ -15,5 +15,5 @@ public interface IUserService {
     Week getWeek(Map<String, Object> params);
     Week buildTemplate(Map<String, Object> params);
     public boolean updateTemplate(Map<String, Object> params);
-    public Week getTemplateByUsername(Map<String, Object> params);
+    public Week getTemplateByUsername(String username);
 }
