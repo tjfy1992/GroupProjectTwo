@@ -11,6 +11,7 @@ export default class Profile extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            username: '',
             phone: '',
             email: '',
             address: '',
@@ -38,10 +39,35 @@ export default class Profile extends Component {
 
     saveUpdate = (e) => {
         e.preventDefault();
+        console.log(this.state)
+        this.state.username = this.state.userProfiles.user.username;
+        if (this.state.phone === "") {
+            this.state.phone = this.state.userProfiles.user.phone;
+        }
+        if (this.state.email === "") {
+            this.state.email = this.state.userProfiles.user.email;
+        }
+        if (this.state.address === "") {
+            this.state.address = this.state.userProfiles.user.email;
+        }
+        if (this.state.emergencyContact1Name === "") {
+            this.state.emergencyContact1Name = this.state.userProfiles.user.emergencyContacts[0].firstName + ' ' + this.state.userProfiles.user.emergencyContacts[0].lastName;
+        }
+        if (this.state.emergencyContact1Phone === "") {
+            this.state.emergencyContact1Phone = this.state.userProfiles.user.emergencyContact1Phone;
+        }
+        if (this.state.emergencyContact2Name === "") {
+            this.state.emergencyContact2Name = this.state.userProfiles.user.emergencyContacts[1].firstName + ' ' + this.state.userProfiles.user.emergencyContacts[1].lastName;
+        }
+        if (this.state.emergencyContact2Phone === "") {
+            this.state.emergencyContact2Phone = this.state.userProfiles.user.emergencyContact2Phone;
+        }
+        console.log(this.state)
         axios({
             method: 'post',
             url: 'http://localhost:9000/core/test/updateprofile',
             data: {
+                username: this.state.username,
                 phone: this.state.phone,
                 email: this.state.email,
                 address: this.state.address,

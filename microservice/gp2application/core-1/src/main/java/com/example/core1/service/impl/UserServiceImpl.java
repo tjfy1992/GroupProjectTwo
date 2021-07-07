@@ -5,6 +5,7 @@ import com.example.core1.domain.Day;
 import com.example.core1.domain.TimeSheet;
 import com.example.core1.domain.User;
 import com.example.core1.domain.Week;
+import com.example.core1.domain.EmergencyContact;
 import com.example.core1.service.IUserService;
 import com.google.gson.Gson;
 import org.joda.time.DateTime;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
 
 @Service
 public class UserServiceImpl implements IUserService {
@@ -160,6 +162,77 @@ public class UserServiceImpl implements IUserService {
         user.getTimeSheets().set(position.get(), timeSheet);
         iUserRepo.save(user);
 
+        return true;
+    }
+
+    @Override
+    public boolean updateProfile(Map<String, String> params) {
+        System.out.println("Arrive Service");
+        System.out.println(params);
+
+        List<User> users = iUserRepo.userInfo(params.get("username"));
+        if(users.isEmpty())
+            return false;
+        User user = users.get(0);
+        System.out.println(user);
+        user.setPhone(params.get("phone"));
+        user.setEmail(params.get("email"));
+        user.setAddress(params.get("address"));
+
+        List<EmergencyContact> contactList = new ArrayList<>();;
+        EmergencyContact ec1 = new EmergencyContact();
+        EmergencyContact ec2 = new EmergencyContact();
+
+        String emergencyContact1Name = params.get("emergencyContact1Name");
+        String[] Name1Split = emergencyContact1Name.split("\\s+");
+        String contact1FirstName = "", contact1LastName = "";
+        if (Name1Split.length >= 2) {
+            contact1FirstName = Name1Split[0];
+            contact1LastName = Name1Split[1];
+        }
+        ec1.setFirstName(contact1FirstName);
+        ec1.setLastName(contact1LastName);
+        ec1.setPhone(params.get("emergencyContact1Phone"));
+
+        String emergencyContact2Name = params.get("emergencyContact2Name");
+        String[] Name2Split = emergencyContact2Name.split("\\s+");
+        String contact2FirstName = "", contact2LastName = "";
+        if (Name2Split.length >= 2) {
+            contact2FirstName = Name2Split[0];
+            contact2LastName = Name2Split[1];
+        }
+        ec2.setFirstName(contact2FirstName);
+        ec2.setLastName(contact2LastName);
+        ec2.setPhone(params.get("emergencyContact2Phone"));
+
+        contactList.add(ec1);
+        contactList.add(ec2);
+
+        user.setEmergencyContacts(contactList);
+
+        System.out.println(user);
+        ;iUserRepo.save(user);
+        /*String phone = params.get("phone");
+        String email = params.get("email");
+        String address = params.get("address");
+
+        String emergencyContact1Name = params.get("emergencyContact1Name");
+        String[] Name1Split = emergencyContact1Name.split("\\s+");
+        String contact1FirstName = "", contact1LastName = "";
+        if (Name1Split.length >= 2) {
+            contact1FirstName = Name1Split[0];
+            contact1LastName = Name1Split[1];
+        }
+        String emergencyContact1Phone = params.get("emergencyContact1Phone");
+
+        String emergencyContact2Name = params.get("emergencyContact2Name");
+        String[] Name2Split = emergencyContact2Name.split("\\s+");
+        String contact2FirstName = "", contact2LastName = "";
+        if (Name2Split.length >= 2) {
+            contact2FirstName = Name2Split[0];
+            contact2LastName = Name2Split[1];
+        }
+        String emergencyContact2Phone = params.get("emergencyContact2Phone");*/
         return true;
     }
 
