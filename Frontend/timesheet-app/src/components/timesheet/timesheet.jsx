@@ -5,6 +5,7 @@ import './timesheet.css';
 import axios from 'axios'
 import moment from 'moment';
 import jwt from 'jwt-decode'
+import emitter from "../../Domain/ev"
 
 const dateFormat = 'MM/DD/YYYY';
 
@@ -302,8 +303,16 @@ export default class Timesheet extends Component {
         let token = localStorage.getItem('token');
         let decodedusername = jwt(token).sub.split(',')[1].substring(jwt(token).sub.split(',')[1].lastIndexOf("=") + 1, jwt(token).sub.split(',')[1].lastIndexOf("}"));
         this.setState({username: decodedusername});
-        console.log(decodedusername)
+        this.eventEmitter = emitter.addListener("summaryMsg", (msg) => {
+            this.setState({
+                endDate: Date.parse(msg)
+            }, () => this.updateArrayBySelectingDate(moment(this.state.endDate).format('MM/DD/YYYY')))
+        });
         this.getTimesheetData();
+    }
+
+    componentWillUnmount(){
+        emitter.removeListener(this.eventEmitter);
     }
 
     constructor(props) {
@@ -368,10 +377,21 @@ export default class Timesheet extends Component {
         }
     };
 
+    datePickerElement = (dateObj) => {
+        return (
+            <DatePicker 
+                // defaultValue={moment(moment(dateObj).format(dateFormat), dateFormat)} 
+                format={dateFormat} 
+                disabledDate={disabledDate} 
+                value={moment(moment(dateObj).format(dateFormat), dateFormat)} 
+                onChange={value => this.dataPickerChange(value)} />
+        )
+    }
+
     render() {
         return (
             <div>
-                Week Ending: <DatePicker defaultValue={moment(moment(this.state.endDate).format(dateFormat), dateFormat)} format={dateFormat} disabledDate={disabledDate} onChange={value => this.dataPickerChange(value)} />
+                Week Ending: {this.datePickerElement(this.state.endDate)}
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 Total Billing Hours:<InputNumber min={0} max={168} disabled={true} value={this.state.totalBill} defaultValue={40} />
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

@@ -3,7 +3,7 @@ import {Popover, Button, Table, Tag, Space, Badge,Tooltip} from 'antd';
 import {InfoCircleTwoTone} from '@ant-design/icons';
 import axios from 'axios';
 import moment from 'moment';
-
+import emitter from "../../Domain/ev"
 
 const columns = [
   {
@@ -426,7 +426,7 @@ export default class Summary extends Component {
 
 
   handleOption = (summary,option) => (event) => {
-
+    emitter.emit("summaryMsg", summary.weekEnding)
     if(option === 'view'){
       this.props.delivery('view',summary.weekEnding)
       console.log('view',summary.weekEnding)
