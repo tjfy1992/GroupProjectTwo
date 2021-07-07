@@ -41,6 +41,8 @@ public class TimesheetController {
 
     @PostMapping("/updateTimesheet")
     public Map<String, Object> updateTimesheet(@RequestParam Map<String, Object> params) {
+        //System.out.println(params);
+        //System.out.println(params.get("endDate"));
         Map<String, Object> resultMap = new HashMap<>();
         iUserService.updateTimeSheet(params);
         return resultMap;
@@ -48,6 +50,8 @@ public class TimesheetController {
 
     @PostMapping("/addTimesheet")
     public Map<String, Object> addTimesheet(@RequestParam Map<String, Object> params) {
+        //System.out.println(params);
+        //System.out.println(params.get("endDate"));
         Map<String, Object> resultMap = new HashMap<>();
         iUserService.addTimesheet(params);
         return resultMap;

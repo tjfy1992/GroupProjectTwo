@@ -91,9 +91,8 @@ public class TestController {
     }*/
 
     @PostMapping(value="/updateprofile")
-    public ResponseEntity<Map<String, Object>> updateUserProfile(@RequestParam Map<String, String> params){
-        System.out.println(params);
-        //System.out.println(params.get("phone"));
+    public Map<String, Object> updateUserProfile(@RequestParam Map<String, String> params){
+        //System.out.println(params);
         String phone = params.get("phone");
         String email = params.get("email");
         String address = params.get("address");
@@ -115,11 +114,11 @@ public class TestController {
             contact2LastName = Name2Split[1];
         }
         String emergencyContact2Phone = params.get("emergencyContact2Phone");
-
-        //System.out.println(contact1FirstName + contact1LastName);
-
-        Map<String, Object> resultMap = iUserService.getAllUsers();
-        return ResponseEntity.ok(resultMap);
+        //Map<String, Object> resultMap = iUserService.getAllUsers();
+        //return ResponseEntity.ok(resultMap);
+        Map<String, Object> resultMap = new HashMap<>();
+        iUserService.updateProfile(params);
+        return resultMap;
     }
 
     @GetMapping("/testGet")
