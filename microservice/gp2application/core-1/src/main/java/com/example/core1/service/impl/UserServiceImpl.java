@@ -64,7 +64,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public Week getTemplateByUsername(String username) {
-        List<Week> week= iUserRepo.getUserTemplate("zack");
+        List<User> users = iUserRepo.userInfo(params.get("username").toString());
         if(week.isEmpty())
             return null;
         return week.get(0);
@@ -73,7 +73,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public boolean updateTemplate(Map<String, Object> params) {
         Week week = this.buildTemplate(params);
-        List<User> users = iUserRepo.userInfo("zack");
+        List<User> users = iUserRepo.userInfo(params.get("username").toString());
         if (users.isEmpty())
             return false;
         User user = users.get(0);
@@ -84,7 +84,9 @@ public class UserServiceImpl implements IUserService {
     @Override
     public boolean updateTimeSheet(Map<String, Object> params) {
         Week week = this.buildWeek(params);
-        List<User> users = iUserRepo.userInfo("zack");
+
+        List<User> users = iUserRepo.userInfo(params.get("username").toString());
+
         if(users.isEmpty())
             return false;
         User user = users.get(0);
@@ -127,10 +129,10 @@ public class UserServiceImpl implements IUserService {
         }
 
         //update the remaining vacation days and floating days
-        user.getTimeSheets().get(position.get()).setRemainingVacationDays(
-                user.getTimeSheets().get(position.get()).getRemainingVacationDays() - vacationDaysThisWeek);
-        user.getTimeSheets().get(position.get()).setRemainingFloatingDays(
-                user.getTimeSheets().get(position.get()).getTotalFloatingDays() - floatingDaysThisWeek);
+        int vacationDaysDifference = vacationDaysThisWeek - vacationDaysInExistedWeek;
+        user.getTimeSheets().get(position.get()).setRemainingVacationDays(timeSheet.getRemainingVacationDays() - vacationDaysDifference);
+        int floatingDaysDifference = floatingDaysThisWeek - floatingDaysInExistedWeek;
+        user.getTimeSheets().get(position.get()).setRemainingFloatingDays(timeSheet.getRemainingFloatingDays() - floatingDaysDifference);
         user.getTimeSheets().get(position.get()).getWeeks().set(position2.get(), week);
         System.out.println(user);
         iUserRepo.save(user);
@@ -142,7 +144,7 @@ public class UserServiceImpl implements IUserService {
     public boolean addTimesheet(Map<String, Object> params) {
         Week week = this.buildWeek(params);
 
-        List<User> users = iUserRepo.userInfo("zack");
+        List<User> users = iUserRepo.userInfo(params.get("username").toString());
         if(users.isEmpty())
             return false;
         User user = users.get(0);
@@ -174,9 +176,9 @@ public class UserServiceImpl implements IUserService {
 
         //update the remaining vacation days and floating days
         user.getTimeSheets().get(position.get()).setRemainingVacationDays(
-                user.getTimeSheets().get(position.get()).getRemainingVacationDays() - vacationDaysThisWeek);
+                timeSheet.getRemainingVacationDays() - vacationDaysThisWeek);
         user.getTimeSheets().get(position.get()).setRemainingFloatingDays(
-                user.getTimeSheets().get(position.get()).getTotalFloatingDays() - floatingDaysThisWeek);
+                timeSheet.getRemainingVacationDays() - floatingDaysThisWeek);
 
         user.getTimeSheets().set(position.get(), timeSheet);
         System.out.println(user);
