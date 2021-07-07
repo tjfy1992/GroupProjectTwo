@@ -6,7 +6,7 @@ import com.example.core1.domain.Week;
 import java.util.Map;
 
 public interface IUserService {
-    public Map<String, Object> userInfo(Map<String, Object> param);
+    Map<String, Object> userInfo(Map<String, Object> param);
     Map<String, Object> getAllUsers();
     User getUserByUsername(String username);
     boolean updateTimeSheet(Map<String, Object> params);
@@ -14,6 +14,6 @@ public interface IUserService {
     boolean updateProfile(Map<String, String> params);
     Week getWeek(Map<String, Object> params);
     Week buildTemplate(Map<String, Object> params);
-    public boolean updateTemplate(Map<String, Object> params);
-    public Week getTemplateByUsername(String username);
+    boolean updateTemplate(Map<String, Object> params);
+    Week getTemplateByUsername(String username);
 }

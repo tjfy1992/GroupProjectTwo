@@ -111,6 +111,9 @@ export default class Timesheet extends Component {
     }
 
     startChange(rowId, value) {
+        console.log(123123)
+        console.log(rowId)
+        console.log(value)
         let preRow = { ...this.state.rows }
         if (preRow[rowId] === undefined) { 
             console.log("undefined row"); 
@@ -126,6 +129,7 @@ export default class Timesheet extends Component {
         }
         preRow[rowId].workHourMeta = newWorkHour;
         preRow[rowId].totalHours = <InputNumber min={0} max={40} disabled={true} value={newWorkHour} />
+        console.log(preRow)
         this.setState({ preRow }, () => {
             this.calTotalBillCopo()
         });
@@ -191,12 +195,11 @@ export default class Timesheet extends Component {
 
     updateArrayBySelectingDate = (value) => {
         this.setState({ rows: [] }, () => {
-            //this.updateDateArray();
             this.getTimesheetData(this.state.username, value);
         });
     }
 
-    updateDateArray = () => {
+    updateDateArray = (first) => {
 
         //get the end date of the week, which is Saturday
         const dateObj = new Date(this.state.endDate);
@@ -213,11 +216,69 @@ export default class Timesheet extends Component {
 
         while (monToday <= momentEndDate) {
             let day = today.getDay();
+            let dayStr = moment(today).format('dddd');
             let startMeta = 9
             let endMeta = 17
             let workHourMeta = 8
             let startSelector = this.weekDayStartSelect(i - 1)
             let endSelector = this.weekDayEndSelect(i - 1)
+            console.log(this.state.template)
+            if(first === true){
+                switch(dayStr){
+                    case "Sunday":
+                        startMeta = this.state.template.sunday.startingTime;
+                        endMeta = this.state.template.sunday.endingTime;
+                        workHourMeta = startMeta === 'NA' || endMeta === 'NA'? 0 : (endMeta - startMeta);
+                        startSelector = this.weekDayStartSelect(i - 1, startMeta)
+                        endSelector = this.weekDayEndSelect(i - 1, endMeta)
+                        break;
+                    case "Saturday":
+                        startMeta = this.state.template.saturday.startingTime;
+                        endMeta = this.state.template.saturday.endingTime;
+                        workHourMeta = startMeta === 'NA' || endMeta === 'NA'? 0 : (endMeta - startMeta);
+                        startSelector = this.weekDayStartSelect(i - 1, startMeta)
+                        endSelector = this.weekDayEndSelect(i - 1, endMeta)
+                        break;
+                    case "Friday":
+                        startMeta = this.state.template.friday.startingTime;
+                        endMeta = this.state.template.friday.endingTime;
+                        workHourMeta = startMeta === 'NA' || endMeta === 'NA'? 0 : (endMeta - startMeta);
+                        startSelector = this.weekDayStartSelect(i - 1, startMeta)
+                        endSelector = this.weekDayEndSelect(i - 1, endMeta)
+                        break;
+                    case "Thursday":
+                        startMeta = this.state.template.thursday.startingTime;
+                        endMeta = this.state.template.thursday.endingTime;
+                        workHourMeta = startMeta === 'NA' || endMeta === 'NA'? 0 : (endMeta - startMeta);
+                        startSelector = this.weekDayStartSelect(i - 1, startMeta)
+                        endSelector = this.weekDayEndSelect(i - 1, endMeta)
+                        break;
+                    case "Wednesday":
+                        startMeta = this.state.template.wednesday.startingTime;
+                        endMeta = this.state.template.wednesday.endingTime;
+                        workHourMeta = startMeta === 'NA' || endMeta === 'NA'? 0 : (endMeta - startMeta);
+                        startSelector = this.weekDayStartSelect(i - 1, startMeta)
+                        endSelector = this.weekDayEndSelect(i - 1, endMeta)
+                        break;
+                    case "Tuesday":
+                        startMeta = this.state.template.tuesday.startingTime;
+                        endMeta = this.state.template.tuesday.endingTime;
+                        workHourMeta = startMeta === 'NA' || endMeta === 'NA'? 0 : (endMeta - startMeta);
+                        startSelector = this.weekDayStartSelect(i - 1, startMeta)
+                        endSelector = this.weekDayEndSelect(i - 1, endMeta)
+                        break;
+                    case "Monday":
+                        startMeta = this.state.template.monday.startingTime;
+                        endMeta = this.state.template.monday.endingTime;
+                        workHourMeta = startMeta === 'NA' || endMeta === 'NA'? 0 : (endMeta - startMeta);
+                        startSelector = this.weekDayStartSelect(i - 1, startMeta)
+                        endSelector = this.weekDayEndSelect(i - 1, endMeta)
+                        break;
+                    default:
+                        break;
+                }
+            }
+            
 
             if (day === 6 || day === 0) {
                 startMeta = 0
@@ -228,7 +289,7 @@ export default class Timesheet extends Component {
             arr.push({
                 key: i,
                 day: day,
-                dayStr: moment(today).format('dddd'),
+                dayStr: dayStr,
                 date: moment(today).format('MM/DD/YYYY'),
                 startTime: startSelector,
                 endingTime: endSelector,
@@ -245,6 +306,7 @@ export default class Timesheet extends Component {
             monToday = moment(today).format('MM/DD/YYYY')
         }
 
+        console.log(arr)
         arr = arr.reverse()
 
         this.setState({ rows: arr }, () => {
@@ -327,6 +389,7 @@ export default class Timesheet extends Component {
             totalBill: 40,
             totalComposite: 40,
             username: '',
+            template: ''
         };
     }
 
@@ -487,54 +550,76 @@ export default class Timesheet extends Component {
 
     setDefault = () => {
         
-        if(this.state.currentOperation === "Update"){
             var {userName} = this.props;
-            let template = {username: userName,
-                            Sunday:'',
-                            Monday:'',
-                            Tuesday:'',
-                            Wednesday:'',
-                            Thursday:'',
-                            Friday:'',
-                            Saturday:'',
-                            };
+            let template = {
+                username: userName,
+                Sunday:{},
+                Monday:{},
+                Tuesday:{},
+                Wednesday:{},
+                Thursday:{},
+                Friday:{},
+                Saturday:{},
+            };
             this.state.rows.forEach((item,index) => {
+                console.log(item)
+                console.log(index)
                 let newDay = {
-                    'startingHour': item.startTimeMeta,
-                    'endingHour': item.endTimeMeta,
-                    'isFloatingDay': item.holidayMeta === 0? false: (item.holidayMeta  === 1? true: false),
-                    'isHoliday': item.holidayMeta === 0? false: (item.holidayMeta === 2? true: false),
-                    'isVacation': item.holidayMeta === 0? false: (item.holidayMeta === 3? true: false)
+                    'startingHour': item.startTimeMeta === "NA"? -1: item.startTimeMeta,
+                    'endingHour': item.endTimeMeta === "NA"? -1: item.endTimeMeta,
+                    'isFloatingDay': item.holidayMeta === 0? false: (item.holidayMeta  === 1? true: (item.isFloating?item.isFloating: false)),
+                    'isHoliday': item.holidayMeta === 0? false: (item.holidayMeta === 2? true: (item.isHoliday?item.isHoliday: false)),
+                    'isVacation': item.holidayMeta === 0? false: (item.holidayMeta === 3? true: (item.isVacation?item.isVacation: false))
                 };
                 
-                if(index == 0){
-                    template.Sunday = newDay;
-                } else if(index == 1){
-                    template.Monday = newDay;
-                } else if(index == 2){
-                    template.Tuesday = newDay;
-                } else if(index == 3){
-                    template.Wednesday = newDay;
-                } else if(index == 4){
-                    template.Thursday = newDay;
-                } else if(index == 5){
-                    template.Friday = newDay;
-                } else if(index == 6){
-                    template.Saturday = newDay;
+                if(index === 0){
+                    template.Saturday = Object.assign({}, newDay);
+                } else if(index === 1){
+                    template.Friday = Object.assign({}, newDay);
+                } else if(index === 2){
+                    template.Thursday = Object.assign({}, newDay);
+                } else if(index === 3){
+                    template.Wednesday = Object.assign({}, newDay);
+                } else if(index === 4){
+                    template.Tuesday = Object.assign({}, newDay);
+                } else if(index === 5){
+                    template.Monday = Object.assign({}, newDay);
+                } else if(index === 6){
+                    template.Sunday = Object.assign({}, newDay);
                 }
-                index +=1;
+                //index +=1;
             })
             console.log(template);
             axios({
                 method: 'post',
                 url: 'http://localhost:9000/core/test/updateTemplate',
                 data: template,
+            }).then((response) => {
+                console.log(response)
             })
             
-        }
+        
+    }
+
+
+    getTemplate = (username) => {
+        axios({
+            method: 'get',
+            url: 'http://localhost:9000/core/test/getTemplate?username=' + username,
+          })
+            .then((response) => {
+                console.log(response.data)
+                this.setState({
+                    template: response.data.template
+                })
+            })
+            .catch((error) => {
+                console.log(error)
+        })
     }
 
     getTimesheetData = (username = 'zack', endDate = '07/10/2021') => {
+        this.getTemplate(username);
         axios({
             method: 'get',
             url: 'http://localhost:9000/core/timesheet/getWeek?username=' + username + '&endDate=' + endDate,
@@ -543,7 +628,7 @@ export default class Timesheet extends Component {
                 console.log(response)
                 //updateDateArray
                 if(!response.data.week){
-                    this.setState({currentOperation: "Add"}, () => this.updateDateArray());
+                    this.setState({currentOperation: "Add"}, () => this.updateDateArray(true));
                 }
                 else if(response.data.week.status === "Approved"){
                     this.setState({currentOperation: "View"}, 
