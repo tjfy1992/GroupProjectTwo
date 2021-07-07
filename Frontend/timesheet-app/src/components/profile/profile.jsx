@@ -81,13 +81,6 @@ export default class Profile extends Component {
                 console.log(response)
                 alert("Your profile has been updated");
                 //window.location.reload(false);
-                //localStorage.setItem('phone', response.data.user.phone);
-                // localStorage.setItem('email', response.data.user.email);
-                // localStorage.setItem('address', response.data.user.address);
-                // localStorage.setItem('emergencyContact1Name', response.data.user.emergencyContact1Name);
-                // localStorage.setItem('emergencyContact1Phone', response.data.user.emergencyContact1Phone);
-                // localStorage.setItem('emergencyContact2Name', response.data.user.emergencyContact2Name);
-                // localStorage.setItem('emergencyContact2Phone', response.data.user.emergencyContact2Phone);
             })
             .catch((error) => {
                 console.log(error)
@@ -208,11 +201,11 @@ export default class Profile extends Component {
                         <Input placeholder={this.state.userProfiles.user.emergencyContacts[1].firstName + ' ' + this.state.userProfiles.user.emergencyContacts[1].lastName} onChange={this.handleEmergencyContact2NameChange} />
                     </Form.Item>
                     <Form.Item>
-                        <Input placeholder={this.state.userProfiles.user.emergencyContacts[1].phone} onChange={this.handleEmergencyContact2NameChange} />
+                        <Input placeholder={this.state.userProfiles.user.emergencyContacts[1].phone} onChange={this.handleEmergencyContact2PhoneChange} />
                     </Form.Item>
 
                     <Form.Item style={{textAlign: "center"}}>
-                        <Button type="primary" htmlType="submit" className="login-form-button" onClick={this.saveUpdate}>Save</Button>
+                        <Button type="primary" htmlType="submit" className="login-form-button" style={{marginTop: "20px"}} onClick={this.saveUpdate}>Save Updates</Button>
                     </Form.Item>
 
                 </Form>
