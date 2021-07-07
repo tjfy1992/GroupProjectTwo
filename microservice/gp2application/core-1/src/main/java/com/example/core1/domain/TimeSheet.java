@@ -13,6 +13,7 @@ import java.util.List;
 public class TimeSheet {
     private String year;
     private Integer totalFloatingDays;
+    private Integer totalVacationDays;
     private List<Week> weeks;
     private Integer remainingFloatingDays;
     private Integer remainingVacationDays;

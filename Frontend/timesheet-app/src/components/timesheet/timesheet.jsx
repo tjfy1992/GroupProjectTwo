@@ -4,6 +4,8 @@ import { UploadOutlined } from '@ant-design/icons';
 import './timesheet.css';
 import axios from 'axios'
 import moment from 'moment';
+import jwt from 'jwt-decode'
+
 const dateFormat = 'MM/DD/YYYY';
 
 const { Option } = Select;
@@ -64,7 +66,7 @@ const holidayOption = [
     //  Floating Day/Holiday/Vacation/default
     { label: 'Default', value: 0 },
     { label: 'Floating Day', value: 1 },
-    { label: 'Holiday', value: 2 },
+    { label: 'Holiday', value: 2, disabled: true  },
     { label: 'Vacation', value: 3 },
 ];
 const holidayOptionDis = [
@@ -189,7 +191,7 @@ export default class Timesheet extends Component {
     updateArrayBySelectingDate = (value) => {
         this.setState({ rows: [] }, () => {
             //this.updateDateArray();
-            this.getTimesheetData('zack', value);
+            this.getTimesheetData(this.state.username, value);
         });
     }
 
@@ -241,6 +243,8 @@ export default class Timesheet extends Component {
             today.setDate(today.getDate() + 1);
             monToday = moment(today).format('MM/DD/YYYY')
         }
+
+        arr = arr.reverse()
 
         this.setState({ rows: arr }, () => {
             for (let i = 0; i < this.state.rows.length; i++) {
@@ -295,19 +299,25 @@ export default class Timesheet extends Component {
     }
 
     componentDidMount() {
+        let token = localStorage.getItem('token');
+        let decodedusername = jwt(token).sub.split(',')[1].substring(jwt(token).sub.split(',')[1].lastIndexOf("=") + 1, jwt(token).sub.split(',')[1].lastIndexOf("}"));
+        this.setState({username: decodedusername});
+        console.log(decodedusername)
         this.getTimesheetData();
     }
 
     constructor(props) {
         super(props);
+        console.log(props)
         this.state = {
             isUpdating: false,
             currentOperation: 'Add',
-            endDate: getEndDate(),
+            endDate: props.EndDate? props.EndDate: getEndDate(),
             rows: [],
             fileList: [],
             totalBill: 40,
             totalComposite: 40,
+            username: '',
         };
     }
 
@@ -395,6 +405,7 @@ export default class Timesheet extends Component {
             formData.append('file', this.state.fileList[0]);
         //add another parameter other than the file
         formData.set("endDate", endDate);
+        formData.set("username", this.state.username);
         //let days = []
         this.state.rows.forEach(item => {
             let newItem = {
@@ -402,12 +413,12 @@ export default class Timesheet extends Component {
                 'startingHour': item.startTimeMeta,
                 'endingHour': item.endTimeMeta,
                 'name': item.dayStr,
-                'isFloatingDay': item.holidayMeta === 0? false: (item.holidayMeta  === 1? true: item.isFloating),
-                'isHoliday': item.holidayMeta === 0? false: (item.holidayMeta === 2? true: item.isHoliday),
-                'isVacation': item.holidayMeta === 0? false: (item.holidayMeta === 3? true: item.isVacation)
+                'isFloatingDay': item.holidayMeta === 0? false: (item.holidayMeta  === 1? true: (item.isFloating?item.isFloating: false)),
+                'isHoliday': item.holidayMeta === 0? false: (item.holidayMeta === 2? true: (item.isHoliday?item.isHoliday: false)),
+                'isVacation': item.holidayMeta === 0? false: (item.holidayMeta === 3? true: (item.isVacation?item.isVacation: false))
             };
             //days.push(newItem)
-            console.log(item)
+            console.log(newItem)
             formData.set(item.dayStr, JSON.stringify(newItem))
         })
         
@@ -608,7 +619,8 @@ export default class Timesheet extends Component {
         this.setState({ rows: dataArr }, () => {
             for (let i = 0; i < this.state.rows.length; i++) {
                 let item = this.state.rows[i];
-                let holidayValue = item.isFloating ? 1 : (item.isHoliday? 2 : (item.isVacation? 3: 0))
+                let holidayValue = 
+                    (i === 0 || i === 6)? 2: (item.isFloating ? 1 : (item.isHoliday? 2 : (item.isVacation? 3: 0)))
                 this.state.rows[i].holidayGroup = <Radio.Group
                     options={holidayOptionDis}
                     value={holidayValue}
@@ -756,7 +768,8 @@ export default class Timesheet extends Component {
             for (let i = 0; i < this.state.rows.length; i++) {
 
                 let item = this.state.rows[i];
-                let holidayValue = item.isFloating ? 1 : (item.isHoliday? 2 : (item.isVacation? 3: 0))
+                let holidayValue = 
+                    (i === 0 || i === 6)? 2 : (item.isFloating ? 1 : (item.isHoliday? 2 : (item.isVacation? 3: 0)))
 
                 this.state.rows[i].holidayGroup = <Radio.Group
                     options={(i ===0 || i === 6) ? holidayOptionDis : holidayOption}
