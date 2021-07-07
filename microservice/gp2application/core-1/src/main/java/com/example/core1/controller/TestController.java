@@ -52,25 +52,31 @@ public class TestController {
         return ResponseEntity.ok(map);
     }
 
-    @GetMapping("/summary")
-    public ResponseEntity<List<TimeSheetForSummary>> getListOfTimesheet(@RequestParam Map<String, String> username) {
-//        List<TimeSheetForSummary> list = timesheetRepo.findAllByUserName(username);
-        String uname = username.get("userName");
-        List<TimeSheetForSummary> list = new ArrayList<>();
-        TimeSheetForSummary ts = new TimeSheetForSummary(1,"Zack","03/21/2018",30,"Completed","Approved",0,1,3);
-        TimeSheetForSummary ts2 = new TimeSheetForSummary(2,"Zack","04/21/2018",31,"Incomplete","Not approved",3,1,1);
-        TimeSheetForSummary ts3 = new TimeSheetForSummary(3,"Zack","05/21/2018",23,"Not Started","N/A",0,0,0);
-        list.add(ts);
-        list.add(ts2);
-        list.add(ts3);
-        if (list == null) {
-            System.out.println("empty list");
+    @GetMapping("/getTemplate")
+    public ResponseEntity<Map<String, Object>> getTemplate(@RequestParam Map<String, Object> params) {
+        if(params.get("username") == null){
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("result", "false");
+            return ResponseEntity.ok(resultMap);
         }
-        System.out.println(list.toString());
-        return ResponseEntity.ok(list);
+        Map<String, Object> map =  new HashMap<>();
+        map.put("result","true");
+        map.put("template",iUserService.getTemplateByUsername(params.get("username")));
+        return ResponseEntity.ok(map);
     }
 
-
+    @PostMapping("/updateTemplate")
+    public ResponseEntity<Map<String, Object>> udpateTemplate(@RequestParam Map<String, Object> params) {
+        if(params.get("username") == null){
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("result", "fail");
+            return ResponseEntity.ok(resultMap);
+        }
+        Map<String, Object> map =  new HashMap<>();
+        map.put("result","success");
+        iUserService.updateTemplate(params);
+        return ResponseEntity.ok(map);
+    }
 
     /*@GetMapping("/profile")
     public ResponseEntity<User> getUserProfile(@RequestParam Map<String, String> username) {
