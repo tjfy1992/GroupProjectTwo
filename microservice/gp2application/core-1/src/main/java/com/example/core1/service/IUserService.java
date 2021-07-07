@@ -11,6 +11,7 @@ public interface IUserService {
     User getUserByUsername(String username);
     boolean updateTimeSheet(Map<String, Object> params);
     boolean addTimesheet(Map<String, Object> params);
+    boolean updateProfile(Map<String, String> params);
     Week getWeek(Map<String, Object> params);
     Week buildTemplate(Map<String, Object> params);
     public boolean updateTemplate(Map<String, Object> params);

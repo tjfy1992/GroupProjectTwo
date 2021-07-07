@@ -78,6 +78,7 @@ public class TestController {
         return ResponseEntity.ok(map);
     }
 
+
     /*@GetMapping("/profile")
     public ResponseEntity<User> getUserProfile(@RequestParam Map<String, String> username) {
         String uname = username.get("userName");
@@ -88,7 +89,6 @@ public class TestController {
         emergencyContactList.add(ec1);
         emergencyContactList.add(ec2);
         User user = new User("60dfe7706d29da8cbbdb82f6", "Zack", "123456", "1234567890", "zack@beaconfire.com", "200 Sayre Drive, Princeton, New Jersey, 08648", emergencyContactList, timeSheetList);
-
         if (user == null) {
             System.out.println("No profile available");
         }
@@ -97,35 +97,10 @@ public class TestController {
     }*/
 
     @PostMapping(value="/updateprofile")
-    public ResponseEntity<Map<String, Object>> updateUserProfile(@RequestParam Map<String, String> params){
-        System.out.println(params);
-        //System.out.println(params.get("phone"));
-        String phone = params.get("phone");
-        String email = params.get("email");
-        String address = params.get("address");
-
-        String emergencyContact1Name = params.get("emergencyContact1Name");
-        String[] Name1Split = emergencyContact1Name.split("\\s+");
-        String contact1FirstName = "", contact1LastName = "";
-        if (Name1Split.length >= 2) {
-            contact1FirstName = Name1Split[0];
-            contact1LastName = Name1Split[1];
-        }
-        String emergencyContact1Phone = params.get("emergencyContact1Phone");
-
-        String emergencyContact2Name = params.get("emergencyContact2Name");
-        String[] Name2Split = emergencyContact2Name.split("\\s+");
-        String contact2FirstName = "", contact2LastName = "";
-        if (Name2Split.length >= 2) {
-            contact2FirstName = Name2Split[0];
-            contact2LastName = Name2Split[1];
-        }
-        String emergencyContact2Phone = params.get("emergencyContact2Phone");
-
-        //System.out.println(contact1FirstName + contact1LastName);
-
-        Map<String, Object> resultMap = iUserService.getAllUsers();
-        return ResponseEntity.ok(resultMap);
+    public Map<String, Object> updateUserProfile(@RequestParam Map<String, String> params){
+        Map<String, Object> resultMap = new HashMap<>();
+        iUserService.updateProfile(params);
+        return resultMap;
     }
 
     @GetMapping("/testGet")
