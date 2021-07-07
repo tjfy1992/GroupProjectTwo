@@ -35,7 +35,7 @@ const columns = [
     render: (submissionStatus,record)=>{
           var text,badge;
           let color = 'gray';
-          if (submissionStatus === 'Incomplete' && record.approvalStatus === 'N/A') {
+          if (submissionStatus === 'Incomplete' && record.approvalStatus === 'Pending') {
             text = <span>Items due: Proof of Approved TimeSheet</span>;
             badge = <InfoCircleTwoTone  twoToneColor="#eb2f96"/>;
             color = 'geekblue';
