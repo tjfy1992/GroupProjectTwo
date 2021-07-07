@@ -7,6 +7,7 @@ import Timesheet from '../timesheet/timesheet';
 import { Layout, Menu } from 'antd';
 import PropTypes from 'prop-types';
 import axios from 'axios'
+import jwt from 'jwt-decode'
 
 const { Header, Content, Footer } = Layout;
 
@@ -32,7 +33,9 @@ export default class Homepage extends Component {
     componentDidMount(){
         this.testGet();
         this.getUserInfo();
-        this.setState({username: localStorage.getItem('username')});
+        var token = localStorage.getItem('token');
+        var decodedusername = jwt(token).sub.split(',')[1].substring(jwt(token).sub.split(',')[1].lastIndexOf("=") + 1, jwt(token).sub.split(',')[1].lastIndexOf("}"));
+        this.setState({username: decodedusername},()=>console.log(decodedusername));
     }
 
     testGet = () => {
@@ -80,7 +83,7 @@ export default class Homepage extends Component {
                 </Header>
                 <Content className="site-layout" style={{ padding: '0 50px', marginTop: 74 }}>
                     <div className="site-card-border-less-wrapper">
-                        <Card bordered={false} style={{ width: "80%", height: 800, margin: "0 auto" }}>
+                        <Card bordered={false} style={{ width: "80%", minHeight:"650px" ,height: "100%", margin: "0 auto" }}>
                             <this.Demo/>
                         </Card>
                     </div>  
@@ -97,7 +100,7 @@ export default class Homepage extends Component {
           </TabPane>
 
           <TabPane tab="Timesheet" key="2">
-            <Timesheet option={this.state.option} EndDate={this.state.weekEnding}/>
+            <Timesheet option={this.state.option} EndDate={this.state.weekEnding}S userName={this.state.username}/>
           </TabPane>
 
           <TabPane tab="Profile" key="3">

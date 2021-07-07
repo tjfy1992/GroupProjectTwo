@@ -52,24 +52,31 @@ public class TestController {
         return ResponseEntity.ok(map);
     }
 
-    @GetMapping("/summary")
-    public ResponseEntity<List<TimeSheetForSummary>> getListOfTimesheet(@RequestParam Map<String, String> username) {
-//        List<TimeSheetForSummary> list = timesheetRepo.findAllByUserName(username);
-        String uname = username.get("userName");
-        List<TimeSheetForSummary> list = new ArrayList<>();
-        TimeSheetForSummary ts = new TimeSheetForSummary(1,"Zack","03/21/2018",30,"Completed","Approved",0,1,3);
-        TimeSheetForSummary ts2 = new TimeSheetForSummary(2,"Zack","04/21/2018",31,"Incomplete","Not approved",3,1,1);
-        TimeSheetForSummary ts3 = new TimeSheetForSummary(3,"Zack","05/21/2018",23,"Not Started","N/A",0,0,0);
-        list.add(ts);
-        list.add(ts2);
-        list.add(ts3);
-        if (list == null) {
-            System.out.println("empty list");
+    @GetMapping("/getTemplate")
+    public ResponseEntity<Map<String, Object>> getTemplate(@RequestParam Map<String, Object> params) {
+        if(params.get("username") == null){
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("result", "false");
+            return ResponseEntity.ok(resultMap);
         }
-        System.out.println(list.toString());
-        return ResponseEntity.ok(list);
+        Map<String, Object> map =  new HashMap<>();
+        map.put("result","true");
+        map.put("template",iUserService.getTemplateByUsername(params.get("username").toString()));
+        return ResponseEntity.ok(map);
     }
 
+    @PostMapping("/updateTemplate")
+    public ResponseEntity<Map<String, Object>> udpateTemplate(@RequestParam Map<String, Object> params) {
+        if(params.get("username") == null){
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("result", "fail");
+            return ResponseEntity.ok(resultMap);
+        }
+        Map<String, Object> map =  new HashMap<>();
+        map.put("result","success");
+        iUserService.updateTemplate(params);
+        return ResponseEntity.ok(map);
+    }
 
 
     /*@GetMapping("/profile")
@@ -82,7 +89,6 @@ public class TestController {
         emergencyContactList.add(ec1);
         emergencyContactList.add(ec2);
         User user = new User("60dfe7706d29da8cbbdb82f6", "Zack", "123456", "1234567890", "zack@beaconfire.com", "200 Sayre Drive, Princeton, New Jersey, 08648", emergencyContactList, timeSheetList);
-
         if (user == null) {
             System.out.println("No profile available");
         }
@@ -91,35 +97,10 @@ public class TestController {
     }*/
 
     @PostMapping(value="/updateprofile")
-    public ResponseEntity<Map<String, Object>> updateUserProfile(@RequestParam Map<String, String> params){
-        System.out.println(params);
-        //System.out.println(params.get("phone"));
-        String phone = params.get("phone");
-        String email = params.get("email");
-        String address = params.get("address");
-
-        String emergencyContact1Name = params.get("emergencyContact1Name");
-        String[] Name1Split = emergencyContact1Name.split("\\s+");
-        String contact1FirstName = "", contact1LastName = "";
-        if (Name1Split.length >= 2) {
-            contact1FirstName = Name1Split[0];
-            contact1LastName = Name1Split[1];
-        }
-        String emergencyContact1Phone = params.get("emergencyContact1Phone");
-
-        String emergencyContact2Name = params.get("emergencyContact2Name");
-        String[] Name2Split = emergencyContact2Name.split("\\s+");
-        String contact2FirstName = "", contact2LastName = "";
-        if (Name2Split.length >= 2) {
-            contact2FirstName = Name2Split[0];
-            contact2LastName = Name2Split[1];
-        }
-        String emergencyContact2Phone = params.get("emergencyContact2Phone");
-
-        //System.out.println(contact1FirstName + contact1LastName);
-
-        Map<String, Object> resultMap = iUserService.getAllUsers();
-        return ResponseEntity.ok(resultMap);
+    public Map<String, Object> updateUserProfile(@RequestParam Map<String, String> params){
+        Map<String, Object> resultMap = new HashMap<>();
+        iUserService.updateProfile(params);
+        return resultMap;
     }
 
     @GetMapping("/testGet")

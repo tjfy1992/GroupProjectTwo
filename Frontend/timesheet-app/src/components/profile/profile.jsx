@@ -11,6 +11,7 @@ export default class Profile extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            username: '',
             phone: '',
             email: '',
             address: '',
@@ -38,10 +39,35 @@ export default class Profile extends Component {
 
     saveUpdate = (e) => {
         e.preventDefault();
+        console.log(this.state)
+        this.state.username = this.state.userProfiles.user.username;
+        if (this.state.phone === "") {
+            this.state.phone = this.state.userProfiles.user.phone;
+        }
+        if (this.state.email === "") {
+            this.state.email = this.state.userProfiles.user.email;
+        }
+        if (this.state.address === "") {
+            this.state.address = this.state.userProfiles.user.address;
+        }
+        if (this.state.emergencyContact1Name === "") {
+            this.state.emergencyContact1Name = this.state.userProfiles.user.emergencyContacts[0].firstName + ' ' + this.state.userProfiles.user.emergencyContacts[0].lastName;
+        }
+        if (this.state.emergencyContact1Phone === "") {
+            this.state.emergencyContact1Phone = this.state.userProfiles.user.emergencyContacts[0].phone;
+        }
+        if (this.state.emergencyContact2Name === "") {
+            this.state.emergencyContact2Name = this.state.userProfiles.user.emergencyContacts[1].firstName + ' ' + this.state.userProfiles.user.emergencyContacts[1].lastName;
+        }
+        if (this.state.emergencyContact2Phone === "") {
+            this.state.emergencyContact2Phone = this.state.userProfiles.user.emergencyContacts[1].phone;
+        }
+        console.log(this.state)
         axios({
             method: 'post',
             url: 'http://localhost:9000/core/test/updateprofile',
             data: {
+                username: this.state.username,
                 phone: this.state.phone,
                 email: this.state.email,
                 address: this.state.address,
@@ -54,14 +80,7 @@ export default class Profile extends Component {
             .then((response) => {
                 console.log(response)
                 alert("Your profile has been updated");
-                //window.location.reload(false);
-                //localStorage.setItem('phone', response.data.user.phone);
-                // localStorage.setItem('email', response.data.user.email);
-                // localStorage.setItem('address', response.data.user.address);
-                // localStorage.setItem('emergencyContact1Name', response.data.user.emergencyContact1Name);
-                // localStorage.setItem('emergencyContact1Phone', response.data.user.emergencyContact1Phone);
-                // localStorage.setItem('emergencyContact2Name', response.data.user.emergencyContact2Name);
-                // localStorage.setItem('emergencyContact2Phone', response.data.user.emergencyContact2Phone);
+                window.location.reload(false);
             })
             .catch((error) => {
                 console.log(error)
@@ -142,17 +161,11 @@ export default class Profile extends Component {
 
         return (
             <div style={{textAlign: "left"}}>
-                <Avatar size={64} icon={<UserOutlined />} />
-                <Upload 
-                    onChange={this.handleChange}
-                    beforeUpload={this.beforeUpload}>
-                    <Button icon={<UploadOutlined />}>Click to Upload</Button>
-                </Upload>
-                <Button onClick={this.submit}>Submit</Button>
+
                 <Form labelCol={{ span: 9 }} wrapperCol={{ span: 5, offset: 9 }} layout="horizontal">
                     
                     <Form.Item>
-                        <Title level={5}>Contact</Title>
+                        <Title level={5} style={{marginTop: "20px"}}>Contact</Title>
                     </Form.Item>
                     <Form.Item>
                         <Input placeholder={this.state.userProfiles.user.phone} onChange={this.handlePhoneChange} />
@@ -182,11 +195,11 @@ export default class Profile extends Component {
                         <Input placeholder={this.state.userProfiles.user.emergencyContacts[1].firstName + ' ' + this.state.userProfiles.user.emergencyContacts[1].lastName} onChange={this.handleEmergencyContact2NameChange} />
                     </Form.Item>
                     <Form.Item>
-                        <Input placeholder={this.state.userProfiles.user.emergencyContacts[1].phone} onChange={this.handleEmergencyContact2NameChange} />
+                        <Input placeholder={this.state.userProfiles.user.emergencyContacts[1].phone} onChange={this.handleEmergencyContact2PhoneChange} />
                     </Form.Item>
 
                     <Form.Item style={{textAlign: "center"}}>
-                        <Button type="primary" htmlType="submit" className="login-form-button" onClick={this.saveUpdate}>Save</Button>
+                        <Button type="primary" htmlType="submit" className="login-form-button" style={{marginTop: "20px"}} onClick={this.saveUpdate}>Save Updates</Button>
                     </Form.Item>
 
                 </Form>
@@ -195,4 +208,12 @@ export default class Profile extends Component {
         )
     }
 }
+
+/* <Avatar size={64} icon={<UserOutlined />} />
+<Upload 
+    onChange={this.handleChange}
+    beforeUpload={this.beforeUpload}>
+    <Button icon={<UploadOutlined />}>Click to Upload</Button>
+</Upload>
+<Button onClick={this.submit}>Submit</Button> */
 

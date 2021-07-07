@@ -40,26 +40,27 @@ public class TimesheetController {
     }
 
     @PostMapping("/updateTimesheet")
-    public Map<String, Object> updateTimesheet(@RequestParam Map<String, Object> params) throws ParseException {
+    public Map<String, Object> updateTimesheet(@RequestParam Map<String, Object> params) {
         Map<String, Object> resultMap = new HashMap<>();
-        User user = iUserService.getUserByUsername(params.get("username").toString());
-        String year = params.get("year").toString();
-        List<TimeSheet> timeSheetList = user.getTimeSheets();
-        TimeSheet timeSheet = timeSheetList.stream()
-                .filter(item -> item.getYear().equals(year)).findFirst().orElse(null);
-        List<Week> weeks = timeSheet.getWeeks();
-        long milliseconds = dateFormat.parse("2021-07-03").getTime();
-        Week week = weeks.stream()
-                .filter(item -> item.getWeekEnding().getTime() == milliseconds)
-                .findFirst().orElse(null);
-
+        boolean result = iUserService.updateTimeSheet(params);
+        resultMap.put("result", result);
         return resultMap;
     }
 
     @PostMapping("/addTimesheet")
-    public Map<String, Object> addTimesheet(@RequestParam Map<String, Object> params) throws ParseException {
+    public Map<String, Object> addTimesheet(@RequestParam Map<String, Object> params) {
         Map<String, Object> resultMap = new HashMap<>();
-        iUserService.addTimesheet(params);
+        boolean result = iUserService.addTimesheet(params);
+        resultMap.put("result", result);
         return resultMap;
     }
+
+    @GetMapping("/getWeek")
+    public Map<String, Object> getWeek(@RequestParam Map<String, Object> params) {
+        Map<String, Object> resultMap = new HashMap<>();
+        Week week = iUserService.getWeek(params);
+        resultMap.put("week", week);
+        return resultMap;
+    }
+
 }

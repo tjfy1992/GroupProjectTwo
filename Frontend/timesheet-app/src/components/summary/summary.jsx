@@ -3,14 +3,15 @@ import {Popover, Button, Table, Tag, Space, Badge,Tooltip} from 'antd';
 import {InfoCircleTwoTone} from '@ant-design/icons';
 import axios from 'axios';
 import moment from 'moment';
-
+import emitter from "../../Domain/ev"
 
 const columns = [
   {
     title: 'WeekEnding',
     dataIndex: 'weekEnding',
     key: 'weekEnding',
-
+    sorter: (a, b) => new Date(a.weekEnding) - new Date(b.weekEnding),
+    sortDirections: ['descend'],
   },
   {
     title: 'Total Hours',
@@ -35,7 +36,7 @@ const columns = [
     render: (submissionStatus,record)=>{
           var text,badge;
           let color = 'gray';
-          if (submissionStatus === 'Incomplete' && record.approvalStatus === 'N/A') {
+          if (submissionStatus === 'Incomplete' && record.approvalStatus === 'Pending') {
             text = <span>Items due: Proof of Approved TimeSheet</span>;
             badge = <InfoCircleTwoTone  twoToneColor="#eb2f96"/>;
             color = 'geekblue';
@@ -69,8 +70,8 @@ const columns = [
     dataIndex: 'approvalStatus',
     filters: [
       {
-        text: 'N/A',
-        value: 'N/A',
+        text: 'Pending',
+        value: 'Pending',
       },
       {
         text: 'Not approved',
@@ -83,7 +84,7 @@ const columns = [
     ],
     
     render: (approvalStatus) => {
-      let color = approvalStatus.length === 3 ? 'gray' : 'green';
+      let color = approvalStatus.length === 7 ? 'gray' : 'green';
       if (color ==='gray') {
 
 
@@ -127,19 +128,26 @@ const columns = [
     title: 'Comments',
     key: 'Comments',
     render: (record) => {
+
       var fdayleft = 3-record.usedfloatingday;
       var vdayleft = 3-record.usedvacationday;
       var comment = '',reminder = '',badge = '',finalreminder = '',finalcomment = '';
-      var fcomment = record.usedfloatingday+' floating days required\r';
-      var vcomment = record.usedvacationday+' vacation days required\r';
+      var fcomment = record.requiredfloatingday+' floating days required\r';
+      var vcomment = record.requiredvacationday+' vacation days required\r';
       var hcomment = record.holiday+' holidays included\r';
       var freminder = 'Total floating days left ' + fdayleft +' days\r';
       var vreminder = 'Total vacation days left ' + vdayleft +' days\r';
-      finalreminder += record.usedfloatingday == 0? '':freminder+'. ';
-      finalreminder += record.usedvacationday == 0? '':vreminder+'. ';
-      finalcomment += record.usedfloatingday == 0? '':fcomment+'. ';
-      finalcomment += record.usedvacationday == 0? '':vcomment+'. ';
+
+      finalreminder += record.requiredfloatingday == 0? '':freminder+'. ';
+      finalreminder += record.requiredvacationday == 0? '':vreminder+'. ';
+      finalcomment += record.requiredfloatingday == 0? '':fcomment+'. ';
+      finalcomment += record.requiredvacationday == 0? '':vcomment+'. ';
       finalcomment += record.holiday === 0? '':hcomment+'. ';
+
+      if(fdayleft < 0 || vdayleft <0){
+        finalcomment = 'You have insufficient Floatring/Vacation Days in this year.\r';
+        finalreminder = 'Please check the comment for details. \r'
+      }
       if (finalcomment !== '') {
         comment = finalcomment;
         reminder = finalreminder;
@@ -167,7 +175,7 @@ export default class Summary extends Component {
     this.state = {
       tempsummarys:[],
       summarycolumns:[],
-      count: 1,
+      count: 2,
       show: "Show More",
       userInfos: [],
     };
@@ -176,14 +184,14 @@ export default class Summary extends Component {
 
   
     handleShowMore = () => {
-      if (this.state.tempsummarys.length - this.state.count < 2 && this.state.count !== this.state.tempsummarys.length ) {
+      if (this.state.tempsummarys.length - this.state.count < 2 && this.state.count !== this.state.tempsummarys.length+1 ) {
         this.setState({
-          count: this.state.tempsummarys.length,
+          count: this.state.tempsummarys.length+1,
           show: "Hide All",
         });
-      } else if(this.state.count === this.state.tempsummarys.length){
+      } else if(this.state.count === this.state.tempsummarys.length+1){
         this.setState({
-          count: 1,
+          count: 2,
           show: "Show More",
         });
       } else {
@@ -204,104 +212,179 @@ export default class Summary extends Component {
       this.setState({userInfos: this.props.userInfo},()=>{ this.setState({tempsummarys: this.state.userInfos.user.timeSheets})})
     }
     
-    console.log(this.renderRawData());
+    console.log(this.props.userInfo);
 
   }
 
   renderRawData =() =>{
     var arys = [];
     this.state.tempsummarys
-      .slice(0, this.state.count)
       .forEach((sheet,index) => {
-        var ary = {Year: '',weekEnding : "", totalHours : 0, submissionStatus : '', approvalStatus : '', option : '', usedfloatingday: 0, holiday :'', usedvacationday : 0};
-        ary.Year = sheet.year;
+        var ary = {Year: '',weekEnding : "", totalHours : 0, submissionStatus : '', approvalStatus : '', option : '', usedfloatingday: 0, holiday :0, usedvacationday : 0, requiredfloatingday: 0, requiredvacationday: 0};
         ary.usedfloatingday = 3-sheet.remainingFloatingDays;
         ary.holiday = 0;
         ary.usedvacationday = 3-sheet.remainingVacationDays;
-        if(sheet.submissionStatus != undefined){
-          ary.submissionStatus = sheet.submissionStatus;
-        } else {
+        sheet.weeks
+        .slice(0, this.state.count)
+        .forEach((week,index) => {
+        ary = {Year: '',weekEnding : "", totalHours : 0, submissionStatus : '', approvalStatus : '', option : '', usedfloatingday: ary.usedfloatingday, holiday :0, usedvacationday : ary.usedvacationday, requiredfloatingday: 0, requiredvacationday: 0}          
+        ary.Year = sheet.year;
+        console.log(ary.usedfloatingday,ary.usedvacationday,ary.holiday);
+        if(week.status === "Pending"){
           ary.submissionStatus = 'Incomplete';
+        } else if(week.status === 'Approved'){
+          ary.submissionStatus = 'Completed';
+        } else {
+          week.status = 'N/A'
+          ary.submissionStatus = 'Not Started';
         }
-        if(sheet.approvalStatus != undefined){
-          ary.approvalStatus = sheet.approvalStatus;
+        if(week.status != ''){
+          ary.approvalStatus = week.status;
         } else {
           ary.approvalStatus = 'Not approved';
         }
         if (ary.submissionStatus === "Completed") {
           ary.option = (
-            <a onClick={this.handleOption(sheet,'view')}>
+            <a onClick={this.handleOption(week,'view')}>
             {" "}
             View
           </a>
           );
         } else if (ary.submissionStatus === "Incomplete") {
           ary.option = (
-            <a onClick={this.handleOption(sheet,'edit')}>
+            <a onClick={this.handleOption(week,'edit')}>
               {" "}
               Edit
             </a>
           );
         } else {
           ary.option = (
-            <a onClick={this.handleOption(sheet,'edit')}>
+            <a onClick={this.handleOption(week,'edit')}>
               {" "}
               Start
             </a>
           );
         }
-        sheet.weeks.forEach((week,index) => {
-          console.log(week);
+          ary.totalHours=0
           if(week.weekEnding != undefined){
-            ary.weekEnding = moment(week.weekEnding).format('MM/DD/YYYY');
+            ary.weekEnding='';
+            var date = new Date(week.weekEnding);
+            ary.weekEnding=((date.getMonth() > 8) ? (date.getMonth() + 1) : ('0' + (date.getMonth() + 1))) + '/' + ((date.getDate() > 9) ? date.getDate() : ('0' + date.getDate())) + '/' + date.getFullYear();
           } 
-          if (week.sunday.startingTime.value != undefined){
-            var tempend = new Date(moment(week.sunday.endingTime.value));
-            var tempstart = new Date(moment(week.sunday.startingTime.value));
-            ary.totalHours += tempend.getHours()-tempstart.getHours();;
+          if (week.sunday.startingTime != -1 && week.sunday.floatingDay != true && week.sunday.vacation != true){
+            ary.totalHours += week.sunday.endingTime-week.sunday.startingTime;
+          } else if(week.sunday.startingTime != -1 && week.sunday.floatingDay == true || week.sunday.vacation == true) {
+            ary.totalHours += 8;
           }
-          if (week.monday.startingTime.value != undefined){
-            var tempend = new Date(moment(week.monday.endingTime.value));
-            var tempstart = new Date(moment(week.monday.startingTime.value));
-            ary.totalHours += tempend.getHours()-tempstart.getHours();
+          if (week.monday.startingTime != -1 && week.monday.floatingDay != true && week.monday.vacation != true){
+            ary.totalHours += week.monday.endingTime-week.monday.startingTime;
+          } else if(week.monday.startingTime != -1 && week.monday.floatingDay == true || week.monday.vacation == true) {
+            ary.totalHours += 8;
           }
-          if (week.tuesday.startingTime.value != undefined){
-            var tempend = new Date(moment(week.tuesday.endingTime.value));
-            var tempstart = new Date(moment(week.tuesday.startingTime.value));
-            ary.totalHours += tempend.getHours()-tempstart.getHours();
+          if (week.tuesday.startingTime != -1 && week.tuesday.floatingDay != true && week.tuesday.vacation != true){
+            ary.totalHours += week.tuesday.endingTime-week.tuesday.startingTime;
+          } else if(week.tuesday.startingTime != -1 && week.tuesday.floatingDay == true || week.tuesday.vacation == true) {
+            ary.totalHours += 8;
           }
-          if (week.wednesday.startingTime.value != undefined){
-            var tempend = new Date(moment(week.wednesday.endingTime.value));
-            var tempstart = new Date(moment(week.wednesday.startingTime));
-            ary.totalHours += tempend.getHours()-tempstart.getHours();
+          if (week.wednesday.startingTime!= -1 && week.wednesday.floatingDay != true && week.wednesday.vacation != true){
+            ary.totalHours += week.wednesday.endingTime-week.wednesday.startingTime;
+          }else if(week.wednesday.startingTime != -1 && week.wednesday.floatingDay == true || week.wednesday.vacation == true) {
+            ary.totalHours += 8;
           }
-          if (week.thursday.startingTime.value != undefined){
-            var tempend = new Date(moment(week.thursday.endingTime));
-            var tempstart = new Date(moment(week.thursday.startingTime));
-            ary.totalHours += tempend.getHours()-tempstart.getHours();
+          if (week.thursday.startingTime != -1 && week.thursday.floatingDay != true && week.thursday.vacation != true){
+            ary.totalHours += week.thursday.endingTime-week.thursday.startingTime;
+          } else if(week.thursday.startingTime != -1 && week.thursday.floatingDay == true || week.thursday.vacation == true) {
+            ary.totalHours += 8;
           }
-          if (week.friday.startingTime.value != undefined){
-            var tempend = new Date(moment(week.friday.endingTime));
-            var tempstart = new Date(moment(week.friday.startingTime));
-            ary.totalHours += tempend.getHours()-tempstart.getHours();
+          if (week.friday.startingTime!= -1 && week.friday.floatingDay != true && week.friday.vacation != true){
+            ary.totalHours += week.friday.endingTime-week.friday.startingTime;
+          } else if(week.friday.startingTime != -1 && week.friday.floatingDay == true || week.friday.vacation == true) {
+            ary.totalHours += 8;
           }
-          if (week.saturday.startingTime.value != undefined){
-            var tempend = new Date(moment(week.saturday.endingTime));
-            var tempstart = new Date(moment(week.saturday.startingTime));
-            ary.totalHours += tempend.getHours()-tempstart.getHours();
+          if (week.saturday.startingTime!= -1 && week.saturday.floatingDay != true && week.saturday.vacation != true){
+            ary.totalHours += week.saturday.endingTime-week.saturday.startingTime;
+          } else if(week.saturday.startingTime != -1 && week.saturday.floatingDay == true || week.saturday.vacation == true) {
+            ary.totalHours += 8;
           }
+          if (week.sunday.holiday == false){
+            if(week.sunday.floatingDay == true){
+              ary.requiredfloatingday +=1;
+            } else if (week.sunday.vacation == true){
+              ary.requiredvacationday +=1;
+            }
+          } else {
+              ary.holiday += 1;
+          }
+          if (week.monday.holiday == false){
+            if(week.monday.floatingDay == true){
+              ary.requiredfloatingday +=1;
+            } else if (week.monday.vacation == true){
+              ary.requiredvacationday +=1;
+            }
+          } else {
+              ary.holiday += 1;
+          }
+          if (week.tuesday.holiday == false){
+            if(week.tuesday.floatingDay == true){
+              ary.requiredfloatingday +=1;
+            } else if (week.tuesday.vacation == true){
+              ary.requiredvacationday +=1;
+            }
+          } else {
+              ary.holiday += 1;
+          }
+          if (week.wednesday.holiday == false){
+            if(week.wednesday.floatingDay == true){
+              ary.requiredfloatingday +=1;
+            } else if (week.wednesday.vacation == true){
+              ary.requiredvacationday +=1;
+            }
+          } else {
+              ary.holiday += 1;
+          }
+          if (week.thursday.holiday == false){
+            if(week.thursday.floatingDay == true){
+              ary.requiredfloatingday +=1;
+            } else if (week.thursday.vacation == true){
+              ary.requiredvacationday +=1;
+            }
+          } else {
+              ary.holiday += 1;
+          }
+          if (week.friday.holiday == false){
+            if(week.friday.floatingDay == true){
+              ary.requiredfloatingday +=1;
+            } else if (week.friday.vacation == true){
+              ary.requiredvacationday +=1;
+            }
+          } else {
+              ary.holiday += 1;
+          }
+          if (week.saturday.holiday == false){
+            if(week.saturday.floatingDay == true){
+              ary.requiredfloatingday +=1;
+            } else if (week.saturday.vacation == true){
+              ary.requiredvacationday +=1;
+            }
+          } else {
+              ary.holiday += 1;
+          }
+
+        console.log(ary.requiredfloatingday);
+        console.log(ary.requiredvacationday);
           index += 1;
+          arys.push(ary)
+          // ary = {Year: '',weekEnding : "", totalHours : 0, submissionStatus : '', approvalStatus : '', option : '', usedfloatingday: 0, holiday :0, usedvacationday : 0};
           return (week,ary.totalHours);
         })
-        console.log(index);
-        arys.push(ary)
+        // sheet.remainingFloatingDays -= ary.requiredfloatingday;
+        // sheet.remainingVacationDays -= ary.requiredvacationday;
+
         return (
           sheet
         );
-    return;
-
       }
-
+      
       )
       return (arys)
   }
@@ -358,12 +441,14 @@ export default class Summary extends Component {
 
 
   handleOption = (summary,option) => (event) => {
-    console.log(summary.weekEnding);
+    emitter.emit("summaryMsg", summary.weekEnding)
     if(option === 'view'){
       this.props.delivery('view',summary.weekEnding)
+      console.log('view',summary.weekEnding)
       this.props.goto('2');
     } else {
       this.props.delivery('edit',summary.weekEnding)
+      console.log('edit',summary.weekEnding)
       this.props.goto('2');
     }
 
@@ -404,9 +489,7 @@ export default class Summary extends Component {
 
     render() {
         return (
-
             <div>
-                
                 <Table columns={this.state.summarycolumns} dataSource={this.renderRawData()}  pagination={{ position: ['none', 'none'] }}/>
                 <Button type="primary" shape="round" onClick={this.handleShowMore}>
                 {this.state.show}
