@@ -80,7 +80,7 @@ export default class Profile extends Component {
             .then((response) => {
                 console.log(response)
                 alert("Your profile has been updated");
-                //window.location.reload(false);
+                window.location.reload(false);
             })
             .catch((error) => {
                 console.log(error)
@@ -161,17 +161,11 @@ export default class Profile extends Component {
 
         return (
             <div style={{textAlign: "left"}}>
-                <Avatar size={64} icon={<UserOutlined />} />
-                <Upload 
-                    onChange={this.handleChange}
-                    beforeUpload={this.beforeUpload}>
-                    <Button icon={<UploadOutlined />}>Click to Upload</Button>
-                </Upload>
-                <Button onClick={this.submit}>Submit</Button>
+
                 <Form labelCol={{ span: 9 }} wrapperCol={{ span: 5, offset: 9 }} layout="horizontal">
                     
                     <Form.Item>
-                        <Title level={5}>Contact</Title>
+                        <Title level={5} style={{marginTop: "20px"}}>Contact</Title>
                     </Form.Item>
                     <Form.Item>
                         <Input placeholder={this.state.userProfiles.user.phone} onChange={this.handlePhoneChange} />
@@ -214,4 +208,12 @@ export default class Profile extends Component {
         )
     }
 }
+
+/* <Avatar size={64} icon={<UserOutlined />} />
+<Upload 
+    onChange={this.handleChange}
+    beforeUpload={this.beforeUpload}>
+    <Button icon={<UploadOutlined />}>Click to Upload</Button>
+</Upload>
+<Button onClick={this.submit}>Submit</Button> */
 
