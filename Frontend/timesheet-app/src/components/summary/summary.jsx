@@ -69,8 +69,8 @@ const columns = [
     dataIndex: 'approvalStatus',
     filters: [
       {
-        text: 'N/A',
-        value: 'N/A',
+        text: 'Pending',
+        value: 'Pending',
       },
       {
         text: 'Not approved',
